@@ -6,7 +6,7 @@ def main():
     motor = Motor(Port.C)
 
     motor.run(500)   # speed in degrees per second
-    wait(1000)       # run for 1 second
+    wait(3000)       # run for 1 second
     motor.stop()     # coast to a stop
 
 main()
