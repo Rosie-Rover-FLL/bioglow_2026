@@ -1,8 +1,12 @@
-# pybricks blocks file:{"blocks":{"languageVersion":0,"blocks":[{"type":"blockGlobalSetup","id":"bjK,wS1MYO7aiYkFSwd{","x":150,"y":100,"deletable":false},{"type":"blockGlobalStart","id":"3tJe|AWl0baN(wH9a$@.","x":150,"y":300,"deletable":false,"next":{"block":{"type":"blockPrint","id":"j,,T}?rBkaW$1v?olp4p","extraState":{"optionLevel":0},"inputs":{"TEXT0":{"shadow":{"type":"text","id":"!x5.0YiWya^`(y)yO5B8","fields":{"TEXT":"Hello, Pybricks!"}}}},"next":{"block":{"type":"blockWaitTime","id":"Cd*lG3@}X}w%tq,cKz,n","inputs":{"VALUE0":{"shadow":{"type":"unit_time","id":"~rHZAXqd]vcX]#{`K6qH","fields":{"VALUE0":1000}}}},"next":{"block":{"type":"blockPrint","id":"5o,r31wOy)6,oAH(`;gg","extraState":{"optionLevel":0},"inputs":{"TEXT0":{"shadow":{"type":"text","id":"/h*U*yEz5DeYgvu/-ezJ","fields":{"TEXT":"Have a nice day"}}}}}}}}}}}]},"variables":[{"name":"red","id":".579HV8*Fh!x[aRUyZLp","type":"ColorDef"},{"name":"orange","id":"zH!AM[56g4^7ip:}=W(~","type":"ColorDef"},{"name":"yellow","id":".k8Y{A:LPnKYcm.=rbiO","type":"ColorDef"},{"name":"green","id":"vd|Lll!7WGr%sQyPJFk}","type":"ColorDef"},{"name":"cyan","id":"=}Fmh[^jU][]MB7l_ikC","type":"ColorDef"},{"name":"blue","id":"eK%n.8c03XL!l|ab{ao6","type":"ColorDef"},{"name":"violet","id":"e1Uc0f8^l1bN5v*NcK`#","type":"ColorDef"},{"name":"magenta","id":"-Fa*73VVZ,Vg/)`Ql#!@","type":"ColorDef"},{"name":"white","id":"4O/R[^--,RC[waoO/rgz","type":"ColorDef"},{"name":"none","id":"Ny_=(#).*%YH$VMDL)!E","type":"ColorDef"}],"info":{"type":"pybricks","version":"2.0.0"},"workspaceOptions":{"scrollX":105.99999999999955,"scrollY":0,"scale":1}}
+from pybricks.pupdevices import Motor
+from pybricks.parameters import Port
 from pybricks.tools import wait
 
+def main():
+    motor = Motor(Port.C)
 
-# The main program starts here.
-print('Hello, Pybricks!')
-wait(1000)
-print('Have a nice day')
+    motor.run(500)   # speed in degrees per second
+    wait(1000)       # run for 1 second
+    motor.stop()     # coast to a stop
+
+main()
