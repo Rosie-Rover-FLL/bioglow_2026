@@ -1,13 +1,10 @@
 from pybricks.hubs import PrimeHub
 from pybricks.messaging import BLERadio
 from pybricks.parameters import Axis, Button, Port
-from pybricks.pupdevices import Motor  # ForceSensor unused, no sensor yet
+from pybricks.pupdevices import Motor
 from pybricks.tools import Matrix, wait
 
 from remote_protocol import (
-    LOCK_LEFT,
-    LOCK_NONE,
-    LOCK_RIGHT,
     MAX_TILT_DEG,
     MODE_ATTACHMENT,
     MODE_DRIVE,
@@ -30,6 +27,10 @@ print(ROSIE_REMOTE_BANNER)
 hub = PrimeHub(top_side=Axis.Z, front_side=-Axis.Y)
 radio = BLERadio(REMOTE_BROADCAST_CHANNEL, [])
 
+# Same stop combo as the robot -- CENTER is reserved for something else
+# (coming soon), so it can't be the lone stop button here either.
+hub.system.set_stop_button((Button.CENTER, Button.BLUETOOTH))
+
 # Speed knob: a large motor turned by hand, never driven. Large motors have
 # a physical dot marking their true absolute zero, which persists across
 # power cycles -- so we deliberately do NOT call reset_angle(0) here. The
@@ -39,12 +40,6 @@ SPEED_KNOB_PORT = Port.A
 KNOB_MAX_ANGLE = 90
 
 speed_knob = Motor(SPEED_KNOB_PORT)
-
-# Force sensor doubles as a pushbutton: held down = attachment-control mode.
-# Commented out -- no force sensor on hand yet. Restore once one is
-# available (see the `mode_button.pressed()` branch below, also disabled).
-# FORCE_SENSOR_PORT = Port.B
-# mode_button = ForceSensor(FORCE_SENSOR_PORT)
 
 
 def clamp(value, low, high):
@@ -66,30 +61,33 @@ def ball_matrix(pitch, roll):
     return Matrix(grid)
 
 
+def bar_matrix(pitch):
+    # Attachment mode only cares about pitch (both arm motors always move
+    # together), so the display is a full vertical bar instead of a single
+    # dot -- same column math as ball_matrix, every row lit.
+    tilt_forward = clamp(-pitch / MAX_TILT_DEG, -1, 1)
+    col = int(round(2 + tilt_forward * 2))
+    grid = [[0] * 5 for _ in range(5)]
+    for row in range(5):
+        grid[row][col] = 100
+    return Matrix(grid)
+
+
 while True:
     knob_angle = clamp(speed_knob.angle(), -KNOB_MAX_ANGLE, KNOB_MAX_ANGLE)
     speed_pct = int(50 + knob_angle / KNOB_MAX_ANGLE * 50)
 
     pitch, roll = hub.imu.tilt()
-    hub.display.icon(ball_matrix(pitch, roll))
 
-    # No force sensor on hand yet, so attachment mode is unreachable for
-    # now -- always broadcasting drive mode. Restore this branch once a
-    # force sensor is available:
-    # if mode_button.pressed():
-    #     mode = MODE_ATTACHMENT
-    #     pressed = hub.buttons.pressed()
-    #     if Button.LEFT in pressed:
-    #         lock = LOCK_LEFT
-    #     elif Button.RIGHT in pressed:
-    #         lock = LOCK_RIGHT
-    #     else:
-    #         lock = LOCK_NONE
-    # else:
-    #     mode = MODE_DRIVE
-    #     lock = LOCK_NONE
-    mode = MODE_DRIVE
-    lock = LOCK_NONE
+    # Hold LEFT for attachment-control mode; both arm motors always move
+    # together in that mode, so there's no need for a force sensor or any
+    # per-motor lock.
+    if Button.LEFT in hub.buttons.pressed():
+        mode = MODE_ATTACHMENT
+        hub.display.icon(bar_matrix(pitch))
+    else:
+        mode = MODE_DRIVE
+        hub.display.icon(ball_matrix(pitch, roll))
 
-    radio.broadcast((mode, speed_pct, pitch, roll, lock))
+    radio.broadcast((mode, speed_pct, pitch, roll))
     wait(100)

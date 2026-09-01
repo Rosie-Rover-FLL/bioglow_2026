@@ -131,12 +131,21 @@ which side of the table), and calls the matching `mission.Run(br)`.
 Instead of a `BaseRobot` god-class like Team 24277's, we have a barebones
 `rosie_rover.py` with a `RosieRover` class holding the hub, drive base
 (`left_wheel`, `right_wheel`, `drive_base`), the arm motors
-(`left_top`/`right_top` on Ports C/E), and two color sensors
+(`left_top_motor`/`right_top_motor` on Ports C/E), and two color sensors
 (`left_color_sensor` on Port F, `right_color_sensor` on Port A) — see the
 mission-conversion workflow below for where drive-base setup comes from.
 All six hub ports are now in use (D/B drive, C/E arm, F/A color sensors) —
 no ports free for ad-hoc bench testing of other parts (e.g. the remote's
-knob/force-sensor code) without unplugging something.
+knob code) without unplugging something.
+
+**Drive motor directions, confirmed on hardware (2026-09-01):**
+`left_wheel = Motor(Port.D, Direction.COUNTERCLOCKWISE)`,
+`right_wheel = Motor(Port.B, Direction.CLOCKWISE)`. The very first Blocks
+export we converted into `m1.py`'s setup had these two **reversed**, which
+we copied into `rosie_rover.py` without testing — that's why `m2.py` drove
+backward. If `rosie_rover.py` is ever regenerated from a fresh Blocks
+export, don't trust the export's directions blindly; verify against a real
+`drive_base.straight()` test first.
 
 `master_program.py`:
 - Creates one `RosieRover()` instance.

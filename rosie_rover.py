@@ -9,10 +9,10 @@ from remote_protocol import REMOTE_BROADCAST_CHANNEL, ROBOT_BROADCAST_CHANNEL
 
 class RosieRover:
     def __init__(self):
-        self.left_wheel = Motor(Port.D, Direction.CLOCKWISE)
-        self.right_wheel = Motor(Port.B, Direction.COUNTERCLOCKWISE)
-        self.left_top = Motor(Port.C, Direction.CLOCKWISE)
-        self.right_top = Motor(Port.E, Direction.COUNTERCLOCKWISE)
+        self.left_wheel = Motor(Port.D, Direction.COUNTERCLOCKWISE)
+        self.right_wheel = Motor(Port.B, Direction.CLOCKWISE)
+        self.left_top_motor = Motor(Port.C, Direction.CLOCKWISE)
+        self.right_top_motor = Motor(Port.E, Direction.COUNTERCLOCKWISE)
         self.left_color_sensor = ColorSensor(Port.F)
         self.right_color_sensor = ColorSensor(Port.A)
         self.prime_hub = PrimeHub()

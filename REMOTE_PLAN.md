@@ -2,17 +2,20 @@
 
 ## Status
 
-**Implemented** (2026-08-31): `remote_protocol.py`, `rosie_remote.py`,
-`rosie_rover.py`'s arm motors, and `master_program.py`'s `handle_remote()`.
-Testable today on the robot side (mission mode unaffected; remote branch
-safely no-ops since no second hub exists yet to broadcast). **Not yet
-tested** on real remote hardware — signs/directions on the IMU tilt and the
-exact feel of the knob/tilt scaling will need tuning once the second hub is
-built. Migrated same day from `hub.ble`/`PrimeHub(observe_channels=...)` to
-`pybricks.messaging.BLERadio` after the actual hub's firmware flagged the
-old approach as moved (see "Communication" section below) — this part
-*was* verified against real hardware, since it's just `RosieRover`
-construction, no second hub needed.
+**Implemented** (2026-08-31, revised 2026-09-01): `remote_protocol.py`,
+`rosie_remote.py`, `rosie_rover.py`'s arm motors
+(`left_top_motor`/`right_top_motor`), and `master_program.py`'s
+`handle_remote()`. Migrated from `hub.ble`/`PrimeHub(observe_channels=...)`
+to `pybricks.messaging.BLERadio` after the hub's firmware flagged the old
+approach as moved (see "Communication" below). Tilt signs and the knob's
+absolute-position calibration have both been confirmed on real hardware
+(see "Tilt calibration" and "Knob calibration" below) by jury-rigging the
+robot's own hub as a stand-in for the remote. The force-sensor-based mode
+switch and per-motor lock were dropped in favor of a held LEFT button —
+`rosie_remote.py` now needs no sensor beyond the knob motor, so it's fully
+testable on a single hub. **Still not tested**: actual driving/arm movement
+from a live remote, and BLE range/latency with two real hubs — needs the
+second hub actually built.
 
 ## Goal
 
@@ -33,9 +36,9 @@ day.
 ## Hardware roles
 
 - **Robot hub** ("Rosie Rover"): owns the drive base (Ports B/D) and the
-  arm motors `left_top`/`right_top` (Ports C/E, confirmed permanent —
-  they're in `RosieRover.__init__` now). Only ever receives commands, never
-  broadcasts.
+  arm motors `left_top_motor`/`right_top_motor` (Ports C/E, confirmed
+  permanent — they're in `RosieRover.__init__` now). Only ever receives
+  commands, never broadcasts.
 - **Remote hub** ("Rosie Remote", not yet built): held in two hands, big
   CENTER button near the driver's right thumb, BLUETOOTH button toward the
   front-left corner. Owns:
@@ -43,10 +46,11 @@ day.
     driven) — the overall speed/power knob.
   - The hub's own **IMU** (tilt), used for two different things depending
     on mode (see below).
-  - A **force sensor on Port B**, used as a pushbutton — held down = switch
-    from drive mode to attachment-control mode.
-  - The hub's own **LEFT/RIGHT buttons** — in attachment mode only, used to
-    lock one arm motor stationary so the other can move independently.
+  - The hub's own **LEFT button** — held down = switch to attachment-control
+    mode (released = drive mode). No force sensor needed (design changed
+    2026-09-01, see "Attachment mode" below — originally planned a force
+    sensor pushbutton plus per-motor locking via LEFT/RIGHT, dropped once
+    it became clear the two arm motors should just always move together).
 
 ## Communication: BLE broadcast/observe via `BLERadio`
 
@@ -90,14 +94,16 @@ radio = BLERadio(broadcast_channel, observe_channels)
 **Wire format** (`remote_protocol.py` holds the shared constants so both
 sides can't drift out of sync):
 ```python
-(mode, speed_pct, pitch, roll, lock)
+(mode, speed_pct, pitch, roll)
 ```
-- `mode`: `MODE_DRIVE` (0) or `MODE_ATTACHMENT` (1), from the force sensor.
-- `speed_pct`: 0–100, from the Port A knob (`50 + angle/180*50`, clamped —
-  center of knob's travel = 50%, ±180° reaches 0%/100%).
+- `mode`: `MODE_DRIVE` (0) or `MODE_ATTACHMENT` (1), from whether LEFT is
+  currently held on the remote.
+- `speed_pct`: 0–100, from the Port A knob (absolute position from its
+  physical zero dot — see "Knob calibration" below).
 - `pitch`, `roll`: raw degrees from `hub.imu.tilt()` on the remote.
-- `lock`: `LOCK_NONE`/`LOCK_LEFT`/`LOCK_RIGHT`, only meaningful in
-  attachment mode.
+
+(No `lock` field anymore — dropped along with the force sensor design, see
+"Attachment mode" below.)
 
 ## Drive mode (mode == MODE_DRIVE)
 
@@ -115,21 +121,55 @@ Remote hub held like a joystick:
 
 ## Attachment mode (mode == MODE_ATTACHMENT)
 
-Same IMU, repurposed: only pitch matters (roll ignored), tip forward/back
-drives `left_top`/`right_top` (Ports C/E) together via open-loop
+Entered by holding **LEFT** on the remote (checked live every loop tick —
+not a toggle, mode reverts to drive the instant LEFT is released). Same
+IMU, repurposed: only pitch matters (roll ignored), tip forward/back drives
+`left_top_motor`/`right_top_motor` (Ports C/E) together via open-loop
 `motor.dc(pct)`, scaled by `MAX_ARM_DUTY_PCT = 70` and the same knob
-`speed_pct`. Holding the remote's LEFT button zeroes `left_top` (keeps C
-stationary, only E moves); holding RIGHT zeroes `right_top` (keeps E
-stationary, only C moves) — lets the two motors act independently instead
-of always moving as a mirrored pair.
+`speed_pct`.
+
+**Design changed 2026-09-01**: originally planned a force sensor as a
+pushbutton for the mode switch, plus using the remote's LEFT/RIGHT buttons
+to lock one arm motor stationary so the other could move independently.
+Dropped both — decided the two arm motors should always move together (no
+independent control needed), which meant the force sensor wasn't needed
+either; holding the hub's own LEFT button is simpler and doesn't need extra
+hardware. This also means `rosie_remote.py` is now fully testable without
+any spare sensor at all — everything it needs (a large motor, the hub's own
+buttons and IMU) already exists in one form or another.
 
 Reference: the Blocks program you tested standalone (two motors, opposite
 `Direction` settings so one command spins both the same physical way,
 bang-bang via `Button.LEFT`/`RIGHT` and `dc(±20)`) confirmed the mechanism
-works and which ports/directions to use. That local-button version isn't
-part of this repo — the mechanism itself (ports C/E, opposite directions)
-carried over into `RosieRover`, but the *input* now comes from the remote's
-tilt instead of local buttons.
+and which ports/directions to use. That local-button version isn't part of
+this repo — the mechanism itself (ports C/E, opposite directions) carried
+over into `RosieRover`, but the *input* now comes from the remote's tilt
+instead of local buttons.
+
+## Remote's own display: ball (drive) / bar (attachment)
+
+The remote shows live visual feedback on its own 5x5 display, separate
+from anything the robot shows:
+- **Drive mode**: a single lit pixel — "ball on a plane" — at
+  `(row, col) = (2 + tilt_side*2, 2 + tilt_forward*2)`, using the same
+  `tilt_forward`/`tilt_side` sign convention as the robot's
+  `handle_remote()` (pitch → column: forward=4, backward=0; roll → row:
+  left=0, right=4; center=(2,2) when flat). Verified against three
+  hand-specified examples (forward-only, left-only, forward+left) —
+  matched exactly.
+- **Attachment mode**: a full vertical bar instead of a dot (roll doesn't
+  matter here since both arm motors always move together) — same column
+  math, every row lit in that column.
+
+## Knob calibration (resolved 2026-08-31)
+
+Learned that the large motor has a physical dot marking its true absolute
+zero position, which the motor remembers across power cycles — so
+`rosie_remote.py` deliberately does **not** call `reset_angle(0)` anymore
+(that would have redefined "50% power" to wherever the knob happened to be
+at boot, which isn't what we want). Measured: the dot position (angle 0) is
+50% power, -90° from the dot is 0%, +90° is 100%. `KNOB_MAX_ANGLE` updated
+from an initial guess of 180 to the confirmed **90**.
 
 ## Mode switching in `master_program.py`
 
@@ -199,22 +239,29 @@ the intended remote grip. Raw `hub.imu.tilt()` readings:
 
 ## Open questions still remaining
 
-1. **`MAX_DRIVE_SPEED_MMSEC`, `MAX_TURN_RATE_DEGSEC`, `MAX_ARM_DUTY_PCT`,
-   `KNOB_MAX_ANGLE`** are still guesses pending a real drive test (tilt
-   signs/threshold are now confirmed, per above, but these haven't been
-   driven yet — needs the robot free to actually move).
-2. Force sensor port (`Port.B` on the remote) is wired in code but
-   untested — no force sensor available yet to confirm it physically.
+1. **`MAX_DRIVE_SPEED_MMSEC`, `MAX_TURN_RATE_DEGSEC`, `MAX_ARM_DUTY_PCT`**
+   are still guesses pending a real drive test (tilt signs/threshold and
+   the knob are now confirmed, per above, but these haven't been driven
+   yet — needs the robot free to actually move, and BLE range/latency
+   between two real hubs hasn't been tested at all).
+2. Attachment mode (`Button.LEFT` held → arm control) is implemented but
+   untested end-to-end — the diagnostic run only exercised drive-mode IMU
+   values.
 
 ## Phased implementation
 
-1. ~~Add `left_top`/`right_top` to `RosieRover`.~~ Done.
+1. ~~Add `left_top_motor`/`right_top_motor` to `RosieRover`.~~ Done
+   (renamed from `left_top`/`right_top` 2026-09-01).
 2. ~~Write `rosie_remote.py` (broadcast-only, no robot-side reaction yet
-   needed to test in isolation with `print()`).~~ Done, untested on
-   hardware.
+   needed to test in isolation with `print()`).~~ Done.
 3. ~~Add `handle_remote()` to `master_program.py`.~~ Done.
 4. ~~Add the failsafe (`observe()` returns `None` → stop everything).~~ Done.
 5. ~~Confirm tilt signs and `MAX_TILT_DEG`.~~ Done, see "Tilt calibration"
    above.
-6. **Next**: build the physical remote hub (with a real force sensor), then
-   field-test and retune the remaining drive/arm speed constants.
+6. ~~Confirm knob calibration.~~ Done, see "Knob calibration" above.
+7. ~~Drop the force sensor design; switch attachment mode to a held LEFT
+   button.~~ Done 2026-09-01 — `rosie_remote.py` is now fully testable on
+   a single hub with just a spare large motor, no other sensors needed.
+8. **Next**: build the second hub for real (knob motor permanently
+   mounted), then field-test actual driving and attachment-mode control,
+   and retune the remaining speed constants.

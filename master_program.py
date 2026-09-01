@@ -3,8 +3,6 @@ from pybricks.tools import Matrix, StopWatch, wait
 
 import rosie_rover
 from remote_protocol import (
-    LOCK_LEFT,
-    LOCK_RIGHT,
     MAX_TILT_DEG,
     MODE_ATTACHMENT,
     MODE_DRIVE,
@@ -98,11 +96,11 @@ def handle_remote():
     received = robot.radio.observe(REMOTE_BROADCAST_CHANNEL)
     if received is None:
         robot.drive_base.stop()
-        robot.left_top.dc(0)
-        robot.right_top.dc(0)
+        robot.left_top_motor.dc(0)
+        robot.right_top_motor.dc(0)
         return
 
-    mode, speed_pct, pitch, roll, lock = received
+    mode, speed_pct, pitch, roll = received
     # Measured on real hardware: tipping forward gives negative pitch, and
     # tipping left gives positive roll -- both opposite of what drive_base
     # wants (positive speed = forward, positive turn_rate = clockwise/right).
@@ -111,8 +109,8 @@ def handle_remote():
     power_limit = speed_pct / 100
 
     if mode == MODE_DRIVE:
-        robot.left_top.dc(0)
-        robot.right_top.dc(0)
+        robot.left_top_motor.dc(0)
+        robot.right_top_motor.dc(0)
         speed = MAX_DRIVE_SPEED_MMSEC * power_limit * tilt_forward
         turn_rate = MAX_TURN_RATE_DEGSEC * power_limit * tilt_side
         robot.drive_base.drive(speed, turn_rate)
@@ -120,8 +118,8 @@ def handle_remote():
     elif mode == MODE_ATTACHMENT:
         robot.drive_base.stop()
         arm_duty = MAX_ARM_DUTY_PCT * power_limit * tilt_forward
-        robot.left_top.dc(0 if lock == LOCK_LEFT else arm_duty)
-        robot.right_top.dc(0 if lock == LOCK_RIGHT else arm_duty)
+        robot.left_top_motor.dc(arm_duty)
+        robot.right_top_motor.dc(arm_duty)
 
 
 hub.display.number(mission_number)
