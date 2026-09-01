@@ -112,14 +112,31 @@ which side of the table), and calls the matching `mission.Run(br)`.
   through them with left/right and pick with center — useful prior art, but
   it cycles discrete symbols rather than an incrementing number, so we're
   building our own selector for the two-digit counter behavior we want.
+- `hub.speaker.beep(frequency=500, duration=100)` and
+  `hub.speaker.volume(pct)` (0-100) control the hub's built-in speaker.
+- `StopWatch()` (from `pybricks.tools`) — `.time()` gives elapsed ms since
+  creation, used for mission run-time reporting.
+- **Docs vs. firmware can drift out of sync — trust the hub over the docs
+  site.** Our local `pybricks` pip package is 4.0.0 stable and
+  `docs.pybricks.com` still documents `hub.ble`/`PrimeHub(broadcast_channel=...)`
+  for hub-to-hub messaging, but the *actual hub firmware* had already moved
+  that to `pybricks.messaging.BLERadio` (confirmed via the pybricks
+  4.0.0b11 changelog) and prints a runtime deprecation notice on boot
+  telling you so. When something documented doesn't match what the hub
+  actually does, believe the hub's own error text first. Full details in
+  [REMOTE_PLAN.md](REMOTE_PLAN.md)'s Communication section.
 
 ## Our robot & master program (implemented)
 
 Instead of a `BaseRobot` god-class like Team 24277's, we have a barebones
-`rosie_rover.py` with a `RosieRover` class holding just the hub and drive
-base (`left_wheel`, `right_wheel`, `prime_hub`, `drive_base`). It will grow
-as we need more shared setup (attachment motors, sensors, etc.) — see the
-mission-conversion workflow below for where that setup comes from.
+`rosie_rover.py` with a `RosieRover` class holding the hub, drive base
+(`left_wheel`, `right_wheel`, `drive_base`), the arm motors
+(`left_top`/`right_top` on Ports C/E), and two color sensors
+(`left_color_sensor` on Port F, `right_color_sensor` on Port A) — see the
+mission-conversion workflow below for where drive-base setup comes from.
+All six hub ports are now in use (D/B drive, C/E arm, F/A color sensors) —
+no ports free for ad-hoc bench testing of other parts (e.g. the remote's
+knob/force-sensor code) without unplugging something.
 
 `master_program.py`:
 - Creates one `RosieRover()` instance.
@@ -143,6 +160,24 @@ mission-conversion workflow below for where that setup comes from.
 - `robot.print_battery()` (prints `hub.battery.voltage()` in mV) is called
   once at program start and again right before each mission runs, so
   battery health is visible in the console both at boot and per-mission.
+- Student-facing feedback: beeps and shows a right-pointing "play" triangle
+  on the display while a mission runs (beeps again on completion), and
+  prints `Starting Mission NN` / `Finished Mission NN, time X.X seconds`
+  (via `StopWatch`) to the console for each run. `USE_LOW_VOLUME_BEEP`
+  controls speaker volume (quiet for late-night testing vs. full volume).
+  Prints an ASCII-art "ROSIE ROVER" banner at startup and "Goodbye" on
+  shutdown (via `try`/`finally` around the main loop, since the loop itself
+  never exits on its own — only the CENTER+BLUETOOTH stop signal ends it).
+- Also runs a **remote control mode** concurrently with the selector loop
+  (active whenever a mission isn't running, paused automatically while one
+  is), driven by a second hub over BLE broadcast/observe. Gated behind
+  `IS_REMOTE_ENABLED` (flip to `False` before competition day — it's for
+  driver practice/attachment testing only, not competition runs). Full
+  design, wire format, and open questions (mainly: untested tilt-direction
+  signs and tuning constants, since the second hub doesn't exist yet) are
+  in [REMOTE_PLAN.md](REMOTE_PLAN.md). Related files: `remote_protocol.py`
+  (shared wire-format constants), `rosie_remote.py` (the second hub's
+  program).
 
 ### Things learned from Team 24277 but deliberately *not* carried over
 - **No auto git-pull automation** (they had a "pull on VS Code folder open"
