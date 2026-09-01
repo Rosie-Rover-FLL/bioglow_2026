@@ -2,9 +2,11 @@ from pybricks.hubs import PrimeHub
 from pybricks.messaging import BLERadio
 from pybricks.parameters import Axis, Button, Port
 from pybricks.pupdevices import Motor
-from pybricks.tools import Matrix, wait
+from pybricks.tools import Matrix, StopWatch, wait
 
 from remote_protocol import (
+    MAX_ARM_DUTY_PCT,
+    MAX_DRIVE_SPEED_MMSEC,
     MAX_TILT_DEG,
     MODE_ATTACHMENT,
     MODE_DRIVE,
@@ -23,7 +25,7 @@ print(ROSIE_REMOTE_BANNER)
 # Held flat, buttons facing up, CENTER button toward the driver's right
 # thumb, BLUETOOTH button toward the front-left corner. Confirmed correct
 # on real hardware (2026-08-31): tilting forward/backward barely moves
-# roll, and tilting left/right barely moves pitch -- see REMOTE_PLAN.md.
+# roll, and tilting left/right barely moves pitch.
 hub = PrimeHub(top_side=Axis.Z, front_side=-Axis.Y)
 radio = BLERadio(REMOTE_BROADCAST_CHANNEL, [])
 
@@ -41,6 +43,12 @@ KNOB_MAX_ANGLE = 90
 
 speed_knob = Motor(SPEED_KNOB_PORT)
 
+# Non-blocking "print what we're sending" -- checked every loop but only
+# actually prints once the timer clears 1 second, so it doesn't slow down
+# the ~100ms broadcast/display cadence.
+PRINT_INTERVAL_MS = 1000
+print_timer = StopWatch()
+
 
 def clamp(value, low, high):
     return max(low, min(high, value))
@@ -50,8 +58,7 @@ def ball_matrix(pitch, roll):
     # "Ball on a plane": pitch moves the lit pixel along columns (forward
     # = col 4, backward = col 0), roll moves it along rows (left = row 0,
     # right = row 4), center = (2, 2). Same sign convention as the robot's
-    # tilt_forward/tilt_side, confirmed on real hardware -- see
-    # REMOTE_PLAN.md's "Tilt calibration" section.
+    # tilt_forward/tilt_side, confirmed on real hardware 2026-08-31.
     tilt_forward = clamp(-pitch / MAX_TILT_DEG, -1, 1)
     tilt_side = clamp(-roll / MAX_TILT_DEG, -1, 1)
     col = int(round(2 + tilt_forward * 2))
@@ -79,15 +86,25 @@ while True:
 
     pitch, roll = hub.imu.tilt()
 
-    # Hold LEFT for attachment-control mode; both arm motors always move
+    # Hold RIGHT for attachment-control mode; both arm motors always move
     # together in that mode, so there's no need for a force sensor or any
     # per-motor lock.
-    if Button.LEFT in hub.buttons.pressed():
+    if Button.RIGHT in hub.buttons.pressed():
         mode = MODE_ATTACHMENT
         hub.display.icon(bar_matrix(pitch))
     else:
         mode = MODE_DRIVE
         hub.display.icon(ball_matrix(pitch, roll))
+
+    if print_timer.time() >= PRINT_INTERVAL_MS:
+        power_limit = speed_pct / 100
+        if mode == MODE_ATTACHMENT:
+            arm_pct = MAX_ARM_DUTY_PCT * power_limit
+            print(f"Speed percentage: {speed_pct}%  Attachment motor speed: {arm_pct:.0f}% duty cycle")
+        else:
+            wheel_speed = MAX_DRIVE_SPEED_MMSEC * power_limit
+            print(f"Speed percentage: {speed_pct}%  Wheel motor speed: {wheel_speed:.0f} mm/s")
+        print_timer.reset()
 
     radio.broadcast((mode, speed_pct, pitch, roll))
     wait(100)

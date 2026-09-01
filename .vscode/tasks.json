@@ -55,7 +55,7 @@
                 "ble",
                 "--name",
                 "${config:fllRobotName}",
-                "master_program.py"
+                "rosie_rover_main.py"
             ],
             "problemMatcher": {
                 "owner": "python",
@@ -139,7 +139,7 @@
                 "ble",
                 "--name",
                 "${input:robotName}",
-                "master_program.py"
+                "rosie_rover_main.py"
             ],
             "problemMatcher": {
                 "owner": "python",

@@ -1,6 +1,6 @@
 from pybricks.hubs import PrimeHub
 from pybricks.messaging import BLERadio
-from pybricks.parameters import Direction, Port
+from pybricks.parameters import Axis, Direction, Port
 from pybricks.pupdevices import ColorSensor, Motor
 from pybricks.robotics import DriveBase
 
@@ -15,7 +15,7 @@ class RosieRover:
         self.right_top_motor = Motor(Port.E, Direction.COUNTERCLOCKWISE)
         self.left_color_sensor = ColorSensor(Port.F)
         self.right_color_sensor = ColorSensor(Port.A)
-        self.prime_hub = PrimeHub()
+        self.prime_hub = PrimeHub(top_side=Axis.Z, front_side=-Axis.Y)
         self.radio = BLERadio(ROBOT_BROADCAST_CHANNEL, [REMOTE_BROADCAST_CHANNEL])
         self.drive_base = DriveBase(self.left_wheel, self.right_wheel, 85, 110)
 

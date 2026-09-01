@@ -28,8 +28,17 @@ deleted (2026-08-31) — everything worth keeping was folded into this file,
 
 ## Repo layout
 
-- `master_program.py` — our top-level program that runs on the hub, shows
-  the mission-number selector, and launches the selected mission module.
+- `rosie_rover_main.py` — our top-level program that runs on the robot's
+  hub, shows the mission-number selector, and launches the selected mission
+  module. (Named `master_program.py` until 2026-09-01 — renamed alongside
+  `rosie_remote.py` → `rosie_remote_main.py` so the two main programs are
+  named as a matched pair, distinct from `rosie_rover.py` below.)
+  **Quirk**: the `Ctrl+Shift+L` keybinding (from the
+  `SkipMorrow.vs-code-keybindings-for-pybricks` extension) triggers a task
+  by exact label text, which is baked into that extension — so
+  `.vscode/tasks.json`'s "Run master_program.py on my robot" task label was
+  deliberately left unchanged even though its `args` now push
+  `rosie_rover_main.py`. The stale-looking label is intentional, not a bug.
 - `rosie_rover.py` — the `RosieRover` robot class (hub, drive motors, drive
   base; barebones for now).
 - `m1.py`, `m2.py`, ... — one file per mission, each with a `run(robot)`
@@ -123,8 +132,20 @@ which side of the table), and calls the matching `mission.Run(br)`.
   that to `pybricks.messaging.BLERadio` (confirmed via the pybricks
   4.0.0b11 changelog) and prints a runtime deprecation notice on boot
   telling you so. When something documented doesn't match what the hub
-  actually does, believe the hub's own error text first. Full details in
-  [REMOTE_PLAN.md](REMOTE_PLAN.md)'s Communication section.
+  actually does, believe the hub's own error text first.
+- **MicroPython's compiler accepts less than CPython does — `python3 -c
+  "import ast; ast.parse(...)"` is not a real syntax check for this
+  project.** Found 2026-09-01: two adjacent f-string literals split across
+  lines (`f"a {x}" \n f"b {y}"`, no `+`) parse fine under CPython's `ast`
+  but `mpy-cross` rejects them with `SyntaxError: invalid syntax` — plain
+  strings and a single f-string with a format spec are both fine, just not
+  two f-strings placed next to each other. Caused a real deploy failure in
+  `rosie_remote_main.py`'s status-print code (fixed by merging into one
+  f-string). **To actually verify a file will run on the hub**, compile it
+  with the real cross-compiler instead:
+  `cat file.py | .venv/lib/python3.14/site-packages/mpy_cross_v6/mpy-cross - -s file.py -o /tmp/out.mpy`
+  (exit code 0 = compiles; anything else prints the real MicroPython
+  syntax error, unlike pybricksdev's own traceback which swallows it).
 
 ## Our robot & master program (implemented)
 
@@ -147,17 +168,24 @@ backward. If `rosie_rover.py` is ever regenerated from a fresh Blocks
 export, don't trust the export's directions blindly; verify against a real
 `drive_base.straight()` test first.
 
-`master_program.py`:
+**Hub orientation**: `self.prime_hub = PrimeHub(top_side=Axis.Z,
+front_side=-Axis.Y)` (2026-09-01) — the hub is mounted on the robot the
+same physical way the remote is held, so it uses the same orientation
+config. This affects gyro-based heading correction during driving, not
+just tilt reading (the robot doesn't read its own tilt).
+
+`rosie_rover_main.py`:
 - Creates one `RosieRover()` instance.
 - Reassigns the stop button to `(Button.CENTER, Button.BLUETOOTH)` via
   `hub.system.set_stop_button(...)` so CENTER is free to use as "run"
   instead of "stop".
 - Shows a two-digit number on the hub display, starting at `1`.
-- RIGHT increments the number, LEFT decrements it (wraps between 1 and 99).
+- RIGHT increments the number, LEFT decrements it (wraps between 0 and 99).
+  `0` is reserved for remote control — never map a mission to it.
 - CENTER runs the mission mapped to the current number, via a `MISSIONS`
   dict (`{1: m1.run, ...}`) built from statically-imported mission modules.
   **Mission modules must be imported by literal name at the top of
-  `master_program.py`** (`import m1`, `import m2`, ...) — pybricksdev
+  `rosie_rover_main.py`** (`import m1`, `import m2`, ...) — pybricksdev
   bundles files onto the hub by statically scanning for `import` statements,
   so a dynamically-computed import (e.g. `__import__(f"m{n}")`) would not
   get transferred to the hub.
@@ -177,16 +205,21 @@ export, don't trust the export's directions blindly; verify against a real
   Prints an ASCII-art "ROSIE ROVER" banner at startup and "Goodbye" on
   shutdown (via `try`/`finally` around the main loop, since the loop itself
   never exits on its own — only the CENTER+BLUETOOTH stop signal ends it).
-- Also runs a **remote control mode** concurrently with the selector loop
-  (active whenever a mission isn't running, paused automatically while one
-  is), driven by a second hub over BLE broadcast/observe. Gated behind
-  `IS_REMOTE_ENABLED` (flip to `False` before competition day — it's for
-  driver practice/attachment testing only, not competition runs). Full
-  design, wire format, and open questions (mainly: untested tilt-direction
-  signs and tuning constants, since the second hub doesn't exist yet) are
-  in [REMOTE_PLAN.md](REMOTE_PLAN.md). Related files: `remote_protocol.py`
-  (shared wire-format constants), `rosie_remote.py` (the second hub's
-  program).
+  The stop signal raises inside the loop rather than letting it finish
+  normally, so the `finally` block also calls `stop_remote_motion()` before
+  printing "Goodbye" — nothing guarantees the firmware stops
+  actively-commanded motors on an interrupted (vs. normal) program exit.
+- Also runs a **remote control mode**, driven by a second hub ("Rosie
+  Remote") over BLE broadcast/observe — but only while the display reads
+  mission `0`; any other number and it's completely ignored (no separate
+  on/off flag needed — dialing away from `0` is the off switch). This is
+  for driver practice/attachment testing only, not competition runs.
+  Leaving mission `0` (via any of RIGHT/LEFT/CENTER, or the program
+  stopping entirely) calls `stop_remote_motion()` so nothing keeps moving
+  from a stale remote command. Related files: `remote_protocol.py` (shared
+  wire-format constants, including the drive/arm speed ceilings so the
+  remote's own status print stays consistent with what the robot actually
+  does), `rosie_remote_main.py` (the second hub's program).
 
 ### Things learned from Team 24277 but deliberately *not* carried over
 - **No auto git-pull automation** (they had a "pull on VS Code folder open"
@@ -253,5 +286,5 @@ Note this repo uses lowercase `run(robot)` (not Team 24277's `Run(br)`) —
 keep that consistent across all mission modules.
 
 `m1.py` is the first mission built this way. To add `m2`, `m3`, etc.:
-repeat the conversion above, then in `master_program.py` add `import m2`
+repeat the conversion above, then in `rosie_rover_main.py` add `import m2`
 and add `2: m2.run` to the `MISSIONS` dict.

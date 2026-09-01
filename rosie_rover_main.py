@@ -3,6 +3,8 @@ from pybricks.tools import Matrix, StopWatch, wait
 
 import rosie_rover
 from remote_protocol import (
+    MAX_ARM_DUTY_PCT,
+    MAX_DRIVE_SPEED_MMSEC,
     MAX_TILT_DEG,
     MODE_ATTACHMENT,
     MODE_DRIVE,
@@ -14,18 +16,14 @@ import m1
 import m2
 
 # Map mission numbers to their run functions. Add an entry here each time
-# a new mission module is imported above.
+# a new mission module is imported above. Never map mission 0 -- that
+# number is reserved for remote control mode (see the main loop below).
 MISSIONS = {
     1: m1.run,
     2: m2.run,
 }
 
-# Set to False before competition day to ignore the remote entirely.
-IS_REMOTE_ENABLED = True
-
-MAX_DRIVE_SPEED_MMSEC = 500
 MAX_TURN_RATE_DEGSEC = 200
-MAX_ARM_DUTY_PCT = 70
 
 # Opposite checkerboard patterns, flashed when CENTER is pressed on a number
 # with no mission mapped to it.
@@ -92,12 +90,16 @@ def clamp(value, low, high):
     return max(low, min(high, value))
 
 
+def stop_remote_motion():
+    robot.drive_base.stop()
+    robot.left_top_motor.dc(0)
+    robot.right_top_motor.dc(0)
+
+
 def handle_remote():
     received = robot.radio.observe(REMOTE_BROADCAST_CHANNEL)
     if received is None:
-        robot.drive_base.stop()
-        robot.left_top_motor.dc(0)
-        robot.right_top_motor.dc(0)
+        stop_remote_motion()
         return
 
     mode, speed_pct, pitch, roll = received
@@ -126,21 +128,27 @@ hub.display.number(mission_number)
 
 try:
     while True:
-        if IS_REMOTE_ENABLED:
+        # Mission 0 is reserved for remote control -- no CENTER press
+        # needed, it's just active the whole time the display reads 0, and
+        # completely ignored otherwise. This is so the remote's small
+        # resting movements never nudge the robot while it's being placed
+        # for a mission.
+        if mission_number == 0:
             handle_remote()
 
         pressed = hub.buttons.pressed()
+        was_remote_active = mission_number == 0
 
         if Button.RIGHT in pressed:
             mission_number += 1
             if mission_number > 99:
-                mission_number = 1
+                mission_number = 0
             hub.display.number(mission_number)
             wait_for_release()
 
         elif Button.LEFT in pressed:
             mission_number -= 1
-            if mission_number < 1:
+            if mission_number < 0:
                 mission_number = 99
             hub.display.number(mission_number)
             wait_for_release()
@@ -166,6 +174,13 @@ try:
                 mission_number = max(MISSIONS)
             hub.display.number(mission_number)
 
+        if was_remote_active and mission_number != 0:
+            stop_remote_motion()
+
         wait(10)
 finally:
+    # The stop button raises inside the loop rather than letting the
+    # program finish normally, so nothing guarantees motors get stopped
+    # unless we do it here ourselves.
+    stop_remote_motion()
     print("Goodbye")
