@@ -14,6 +14,7 @@ from remote_protocol import (
 # Import mission modules here as they're written.
 import m1
 import m2
+import m3
 
 # Map mission numbers to their run functions. Add an entry here each time
 # a new mission module is imported above. Never map mission 0 -- that
@@ -21,6 +22,7 @@ import m2
 MISSIONS = {
     1: m1.run,
     2: m2.run,
+    3: m3.run,
 }
 
 MAX_TURN_RATE_DEGSEC = 200
