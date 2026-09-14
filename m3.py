@@ -4,14 +4,17 @@ from pybricks.tools import wait
 
 def run(robot):
     robot.drive_base.settings(straight_speed=800)
-    robot.drive_base.straight(700)
-    wait(1000)
-    robot.drive_base.turn(45)
-    wait(500)
-    robot.drive_base.straight(-40)
-    robot.drive_base.turn(25)
-    wait(1000)
-    robot.drive_base.straight(180)
+    robot.drive_base.straight(-400)
+    robot.drive_base.straight(345)
+    # robot.drive_base.settings(straight_speed=800)
+    # robot.drive_base.straight(700)
+    # wait(1000)
+    # robot.drive_base.turn(45)
+    # wait(500)
+    # robot.drive_base.straight(-40)
+    # robot.drive_base.turn(25)
+    # wait(1000)
+    # robot.drive_base.straight(180)
 
     # Fake demo mission: like m2, but the arm phases are split around the
     # return trip instead of both happening before it, reversed (down
