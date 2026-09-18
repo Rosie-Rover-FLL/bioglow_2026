@@ -47,7 +47,7 @@ while it's being placed by hand for a mission.
 
 ### Rosie Rover (the robot)
 
-| Port | Device | Attribute in `RosieRover` | Notes |
+| Port | Device | Name (from `rosie_rover.setup()`) | Notes |
 |---|---|---|---|
 | A | Color sensor | `right_color_sensor` | |
 | B | Large motor | `right_wheel` | `Direction.CLOCKWISE` |
@@ -75,7 +75,8 @@ driver's right thumb, BLUETOOTH button toward the front-left corner.
 ## File layout at a glance
 
 - `rosie_rover_main.py` — the main program that runs on the robot.
-- `rosie_rover.py` — the `RosieRover` class (the robot's hardware setup).
+- `rosie_rover.py` — `setup()`, a plain function that builds and returns
+  the robot's hardware (no class).
 - `rosie_remote_main.py` — the main program that runs on the remote.
 - `remote_protocol.py` — shared constants so the two main programs agree
   with each other.

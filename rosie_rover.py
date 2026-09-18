@@ -1,23 +1,27 @@
 from pybricks.hubs import PrimeHub
-from pybricks.messaging import BLERadio
 from pybricks.parameters import Axis, Direction, Port
 from pybricks.pupdevices import ColorSensor, Motor
 from pybricks.robotics import DriveBase
 
-from remote_protocol import REMOTE_BROADCAST_CHANNEL, ROBOT_BROADCAST_CHANNEL
+
+def setup():
+    left_wheel = Motor(Port.D, Direction.COUNTERCLOCKWISE)
+    right_wheel = Motor(Port.B, Direction.CLOCKWISE)
+    left_top_motor = Motor(Port.C, Direction.CLOCKWISE)
+    right_top_motor = Motor(Port.E, Direction.COUNTERCLOCKWISE)
+    left_color_sensor = ColorSensor(Port.F)
+    right_color_sensor = ColorSensor(Port.A)
+    prime_hub = PrimeHub(top_side=Axis.Z, front_side=-Axis.Y)
+    drive_base = DriveBase(left_wheel, right_wheel, 85, 110)
+    return (
+        left_top_motor,
+        right_top_motor,
+        left_color_sensor,
+        right_color_sensor,
+        prime_hub,
+        drive_base,
+    )
 
 
-class RosieRover:
-    def __init__(self):
-        self.left_wheel = Motor(Port.D, Direction.COUNTERCLOCKWISE)
-        self.right_wheel = Motor(Port.B, Direction.CLOCKWISE)
-        self.left_top_motor = Motor(Port.C, Direction.CLOCKWISE)
-        self.right_top_motor = Motor(Port.E, Direction.COUNTERCLOCKWISE)
-        self.left_color_sensor = ColorSensor(Port.F)
-        self.right_color_sensor = ColorSensor(Port.A)
-        self.prime_hub = PrimeHub(top_side=Axis.Z, front_side=-Axis.Y)
-        self.radio = BLERadio(ROBOT_BROADCAST_CHANNEL, [REMOTE_BROADCAST_CHANNEL])
-        self.drive_base = DriveBase(self.left_wheel, self.right_wheel, 85, 110)
-
-    def print_battery(self):
-        print(f"Battery voltage: {self.prime_hub.battery.voltage()} mV")
+def print_battery(prime_hub):
+    print(f"Battery voltage: {prime_hub.battery.voltage()} mV")

@@ -39,10 +39,18 @@ deleted (2026-08-31) — everything worth keeping was folded into this file,
   `.vscode/tasks.json`'s "Run master_program.py on my robot" task label was
   deliberately left unchanged even though its `args` now push
   `rosie_rover_main.py`. The stale-looking label is intentional, not a bug.
-- `rosie_rover.py` — the `RosieRover` robot class (hub, drive motors, drive
-  base; barebones for now).
-- `m1.py`, `m2.py`, ... — one file per mission, each with a `run(robot)`
-  function (see "Mission module conversion workflow" below).
+- `rosie_rover.py` — plain functions, no class (changed 2026-09-18, was a
+  `RosieRover` class before that): `setup()` builds the hub, drive motors,
+  drive base, arm motors, and color sensors, and returns exactly six
+  objects (`left_top_motor, right_top_motor, left_color_sensor,
+  right_color_sensor, prime_hub, drive_base`); `print_battery(prime_hub)`
+  is the other function. No mission imports here, so both
+  `rosie_rover_main.py` and every mission's standalone block can import it
+  with zero circular-import risk.
+- `m1.py`, `m2.py`, ... — one file per mission, each with a `run(left_top_motor,
+  right_top_motor, left_color_sensor, right_color_sensor, prime_hub,
+  drive_base)` function taking those same six params positionally (see
+  "Mission module conversion workflow" below).
 - `requirements.txt` — unpinned `pybricks`/`pybricksdev`; we deliberately
   track latest rather than pinning versions like Team 24277 did.
 - `help/` — reference docs worth keeping long-term: `discovery.md` (why
@@ -149,15 +157,26 @@ which side of the table), and calls the matching `mission.Run(br)`.
 
 ## Our robot & master program (implemented)
 
-Instead of a `BaseRobot` god-class like Team 24277's, we have a barebones
-`rosie_rover.py` with a `RosieRover` class holding the hub, drive base
+Instead of a `BaseRobot` god-class like Team 24277's, we don't have a robot
+class at all (dropped 2026-09-18, was a `RosieRover` class before that) —
+`rosie_rover.py`'s `setup()` function builds the hub, drive base
 (`left_wheel`, `right_wheel`, `drive_base`), the arm motors
 (`left_top_motor`/`right_top_motor` on Ports C/E), and two color sensors
-(`left_color_sensor` on Port F, `right_color_sensor` on Port A) — see the
-mission-conversion workflow below for where drive-base setup comes from.
+(`left_color_sensor` on Port F, `right_color_sensor` on Port A), and
+returns six plain objects rather than bundling them into an instance — see
+the mission-conversion workflow below for how those get passed around.
 All six hub ports are now in use (D/B drive, C/E arm, F/A color sensors) —
 no ports free for ad-hoc bench testing of other parts (e.g. the remote's
 knob code) without unplugging something.
+
+**Why no class**: explicit team decision — mission functions take the six
+values as plain positional parameters instead of one `robot` object with
+attributes. `rosie_rover_main.py` unpacks `rosie_rover.setup()`'s return
+tuple into six module-level names once at startup and uses them directly
+(no `robot.` prefix anywhere in that file either) — `left_top_motor`,
+`right_top_motor`, `left_color_sensor`, `right_color_sensor`, `prime_hub`,
+`drive_base` is the canonical order everywhere: the function's return
+tuple, every mission's `run(...)` signature, and every call site.
 
 **Drive motor directions, confirmed on hardware (2026-09-01):**
 `left_wheel = Motor(Port.D, Direction.COUNTERCLOCKWISE)`,
@@ -168,16 +187,19 @@ backward. If `rosie_rover.py` is ever regenerated from a fresh Blocks
 export, don't trust the export's directions blindly; verify against a real
 `drive_base.straight()` test first.
 
-**Hub orientation**: `self.prime_hub = PrimeHub(top_side=Axis.Z,
+**Hub orientation**: `prime_hub = PrimeHub(top_side=Axis.Z,
 front_side=-Axis.Y)` (2026-09-01) — the hub is mounted on the robot the
 same physical way the remote is held, so it uses the same orientation
 config. This affects gyro-based heading correction during driving, not
 just tilt reading (the robot doesn't read its own tilt).
 
 `rosie_rover_main.py`:
-- Creates one `RosieRover()` instance.
+- Calls `rosie_rover.setup()` once and unpacks the six values into
+  module-level names; also builds its own `radio = BLERadio(...)`
+  separately (not part of `setup()`'s six — missions never need it, only
+  the remote-control code in this file does).
 - Reassigns the stop button to `(Button.CENTER, Button.BLUETOOTH)` via
-  `hub.system.set_stop_button(...)` so CENTER is free to use as "run"
+  `prime_hub.system.set_stop_button(...)` so CENTER is free to use as "run"
   instead of "stop".
 - Shows a two-digit number on the hub display, starting at `1`.
 - RIGHT increments the number, LEFT decrements it (wraps between 0 and 99).
@@ -194,9 +216,10 @@ just tilt reading (the robot doesn't read its own tilt).
   checkerboard pattern (and its inverse) on the 5x5 display for 0.5s each,
   then jumps to `max(MISSIONS)` — the highest mission number that actually
   exists.
-- `robot.print_battery()` (prints `hub.battery.voltage()` in mV) is called
-  once at program start and again right before each mission runs, so
-  battery health is visible in the console both at boot and per-mission.
+- `rosie_rover.print_battery(prime_hub)` (prints `hub.battery.voltage()` in
+  mV) is called once at program start and again right before each mission
+  runs, so battery health is visible in the console both at boot and
+  per-mission.
 - Student-facing feedback: beeps and shows a right-pointing "play" triangle
   on the display while a mission runs (beeps again on completion), and
   prints `Starting Mission NN` / `Finished Mission NN, time X.X seconds`
@@ -261,29 +284,35 @@ drive_base.straight(150)
 
 The coach (David) converts this into an `m<N>.py` mission module by hand:
 - The setup block (motors, hub, drive base, sensors) is expected to already
-  be covered by `rosie_rover.py`'s `RosieRover.__init__`. For now every
-  mission shares the same setup, so nothing mission-specific needs to be
-  added there — but as missions need different hardware/setup, we'll need
-  to figure out how to share/extend that.
-- The "main program starts here" block becomes the body of a `run(robot)`
-  function, with bare variable names (`drive_base`, ...) rewritten to
-  `robot.drive_base`, etc.
+  be covered by `rosie_rover.py`'s `setup()`. For now every mission shares
+  the same setup, so nothing mission-specific needs to be added there —
+  but as missions need different hardware/setup, we'll need to figure out
+  how to share/extend that.
+- The "main program starts here" block becomes the body of a `run(...)`
+  function taking the six `setup()` values as plain parameters — bare
+  variable names (`drive_base`, ...) in the Blocks export already match
+  the parameter names directly, no `robot.` prefix needed (that pattern
+  was dropped 2026-09-18 along with the `RosieRover` class).
 - Every mission file ends with the same boilerplate so it can be run
   standalone for testing:
 
 ```python
 import rosie_rover
 
-def run(robot):
-    ...mission steps, using robot.drive_base etc...
+def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, prime_hub, drive_base):
+    ...mission steps, using drive_base etc. directly...
 
 if __name__ == "__main__":
-    robot = rosie_rover.RosieRover()
-    run(robot)
+    run(*rosie_rover.setup())
 ```
 
-Note this repo uses lowercase `run(robot)` (not Team 24277's `Run(br)`) —
-keep that consistent across all mission modules.
+Note this repo uses lowercase `run(...)` (not Team 24277's `Run(br)`) —
+keep that consistent across all mission modules. Parameter order is always
+`left_top_motor, right_top_motor, left_color_sensor, right_color_sensor,
+prime_hub, drive_base`, matching `rosie_rover.setup()`'s return tuple
+exactly — a mission that only uses `drive_base` still declares all six
+parameters (unused ones just sit there; pyright/pylance will flag them as
+unused, that's expected and fine).
 
 `m1.py` is the first mission built this way. To add `m2`, `m3`, etc.:
 repeat the conversion above, then in `rosie_rover_main.py` add `import m2`

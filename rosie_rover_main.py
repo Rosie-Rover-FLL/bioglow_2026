@@ -1,3 +1,4 @@
+from pybricks.messaging import BLERadio
 from pybricks.parameters import Button
 from pybricks.tools import Matrix, StopWatch, wait
 
@@ -9,6 +10,7 @@ from remote_protocol import (
     MODE_ATTACHMENT,
     MODE_DRIVE,
     REMOTE_BROADCAST_CHANNEL,
+    ROBOT_BROADCAST_CHANNEL,
 )
 
 # Import mission modules here as they're written.
@@ -71,20 +73,28 @@ ROSIE_ROVER_BANNER = r"""
 
 print(ROSIE_ROVER_BANNER)
 
-robot = rosie_rover.RosieRover()
-hub = robot.prime_hub
-hub.speaker.volume(10 if USE_LOW_VOLUME_BEEP else 100)
-robot.print_battery()
+(
+    left_top_motor,
+    right_top_motor,
+    left_color_sensor,
+    right_color_sensor,
+    prime_hub,
+    drive_base,
+) = rosie_rover.setup()
+radio = BLERadio(ROBOT_BROADCAST_CHANNEL, [REMOTE_BROADCAST_CHANNEL])
+
+prime_hub.speaker.volume(10 if USE_LOW_VOLUME_BEEP else 100)
+rosie_rover.print_battery(prime_hub)
 
 # By default, pressing CENTER stops the program. We want CENTER to launch
 # missions instead, so require CENTER+BLUETOOTH together to stop the program.
-hub.system.set_stop_button((Button.CENTER, Button.BLUETOOTH))
+prime_hub.system.set_stop_button((Button.CENTER, Button.BLUETOOTH))
 
 mission_number = 1
 
 
 def wait_for_release():
-    while hub.buttons.pressed():
+    while prime_hub.buttons.pressed():
         wait(10)
 
 
@@ -93,13 +103,13 @@ def clamp(value, low, high):
 
 
 def stop_remote_motion():
-    robot.drive_base.stop()
-    robot.left_top_motor.dc(0)
-    robot.right_top_motor.dc(0)
+    drive_base.stop()
+    left_top_motor.dc(0)
+    right_top_motor.dc(0)
 
 
 def handle_remote():
-    received = robot.radio.observe(REMOTE_BROADCAST_CHANNEL)
+    received = radio.observe(REMOTE_BROADCAST_CHANNEL)
     if received is None:
         stop_remote_motion()
         return
@@ -113,20 +123,20 @@ def handle_remote():
     power_limit = speed_pct / 100
 
     if mode == MODE_DRIVE:
-        robot.left_top_motor.dc(0)
-        robot.right_top_motor.dc(0)
+        left_top_motor.dc(0)
+        right_top_motor.dc(0)
         speed = MAX_DRIVE_SPEED_MMSEC * power_limit * tilt_forward
         turn_rate = MAX_TURN_RATE_DEGSEC * power_limit * tilt_side
-        robot.drive_base.drive(speed, turn_rate)
+        drive_base.drive(speed, turn_rate)
 
     elif mode == MODE_ATTACHMENT:
-        robot.drive_base.stop()
+        drive_base.stop()
         arm_duty = MAX_ARM_DUTY_PCT * power_limit * tilt_forward
-        robot.left_top_motor.dc(arm_duty)
-        robot.right_top_motor.dc(arm_duty)
+        left_top_motor.dc(arm_duty)
+        right_top_motor.dc(arm_duty)
 
 
-hub.display.number(mission_number)
+prime_hub.display.number(mission_number)
 
 try:
     while True:
@@ -138,43 +148,50 @@ try:
         if mission_number == 0:
             handle_remote()
 
-        pressed = hub.buttons.pressed()
+        pressed = prime_hub.buttons.pressed()
         was_remote_active = mission_number == 0
 
         if Button.RIGHT in pressed:
             mission_number += 1
             if mission_number > 99:
                 mission_number = 0
-            hub.display.number(mission_number)
+            prime_hub.display.number(mission_number)
             wait_for_release()
 
         elif Button.LEFT in pressed:
             mission_number -= 1
             if mission_number < 0:
                 mission_number = 99
-            hub.display.number(mission_number)
+            prime_hub.display.number(mission_number)
             wait_for_release()
 
         elif Button.CENTER in pressed:
             wait_for_release()
             run_mission = MISSIONS.get(mission_number)
             if run_mission:
-                robot.print_battery()
+                rosie_rover.print_battery(prime_hub)
                 print(f"Starting Mission {mission_number:02}")
-                hub.speaker.beep()
-                hub.display.icon(PLAY_ICON)
+                prime_hub.speaker.beep()
+                prime_hub.display.icon(PLAY_ICON)
                 watch = StopWatch()
-                run_mission(robot)
+                run_mission(
+                    left_top_motor,
+                    right_top_motor,
+                    left_color_sensor,
+                    right_color_sensor,
+                    prime_hub,
+                    drive_base,
+                )
                 elapsed_sec = watch.time() / 1000
-                hub.speaker.beep()
+                prime_hub.speaker.beep()
                 print(f"Finished Mission {mission_number:02}, time {elapsed_sec:.1f} seconds")
             else:
-                hub.display.icon(CHECKER_A)
+                prime_hub.display.icon(CHECKER_A)
                 wait(500)
-                hub.display.icon(CHECKER_B)
+                prime_hub.display.icon(CHECKER_B)
                 wait(500)
                 mission_number = max(MISSIONS)
-            hub.display.number(mission_number)
+            prime_hub.display.number(mission_number)
 
         if was_remote_active and mission_number != 0:
             stop_remote_motion()
