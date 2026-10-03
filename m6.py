@@ -16,5 +16,5 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     # Backs up
     drive_base.settings(straight_speed=200)
     # Sets the rover speed to normal
-    drive_base.turn(90)
+    drive_base.turn(95)
     drive_base.straight(830)
