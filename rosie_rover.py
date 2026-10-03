@@ -2,6 +2,7 @@ from pybricks.hubs import PrimeHub
 from pybricks.parameters import Axis, Direction, Port
 from pybricks.pupdevices import ColorSensor, Motor
 from pybricks.robotics import DriveBase
+from pybricks.tools import wait
 
 
 def setup():
@@ -25,3 +26,13 @@ def setup():
 
 def print_battery(prime_hub):
     print(f"Battery voltage: {prime_hub.battery.voltage()} mV")
+
+
+def straight_until_stalled(drive_base, distance):
+    # Drive straight, but give up early if the robot gets stuck (stalls).
+    drive_base.straight(distance, wait=False)
+    while not drive_base.done():
+        if drive_base.stalled():
+            drive_base.stop()
+            break
+        wait(10)

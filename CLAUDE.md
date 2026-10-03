@@ -44,9 +44,9 @@ deleted (2026-08-31) — everything worth keeping was folded into this file,
   drive base, arm motors, and color sensors, and returns exactly six
   objects (`left_top_motor, right_top_motor, left_color_sensor,
   right_color_sensor, prime_hub, drive_base`); `print_battery(prime_hub)`
-  is the other function. No mission imports here, so both
-  `rosie_rover_main.py` and every mission's standalone block can import it
-  with zero circular-import risk.
+  and `straight_until_stalled(drive_base, distance)` are the other
+  functions. No mission imports here, so both `rosie_rover_main.py` and
+  mission files can import from it with zero circular-import risk.
 - `m1.py`, `m2.py`, ... — one file per mission, each with a `run(left_top_motor,
   right_top_motor, left_color_sensor, right_color_sensor, prime_hub,
   drive_base)` function taking those same six params positionally (see
@@ -293,17 +293,21 @@ The coach (David) converts this into an `m<N>.py` mission module by hand:
   variable names (`drive_base`, ...) in the Blocks export already match
   the parameter names directly, no `robot.` prefix needed (that pattern
   was dropped 2026-09-18 along with the `RosieRover` class).
-- Every mission file ends with the same boilerplate so it can be run
-  standalone for testing:
+- Every mission file is just a `run(...)` function — no `if __name__ ==
+  "__main__"` standalone block (removed 2026-09-18 to keep the m files
+  simple; missions are run through `rosie_rover_main.py` instead). The only
+  import a mission should need is a shared helper, e.g.
+  `from rosie_rover import straight_until_stalled` (added 2026-10-02).
+  **Why the helper exists**: `DriveBase.straight()` has no stop-on-stall
+  option (checked against pybricks source + changelog, 2026-10-02), and
+  `Motor.run_until_stalled()` is per-motor and blocking, so using it on
+  the two wheels would turn them one after the other instead of driving
+  straight. The helper starts `straight(..., wait=False)` and polls
+  `drive_base.stalled()`:
 
 ```python
-import rosie_rover
-
 def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, prime_hub, drive_base):
     ...mission steps, using drive_base etc. directly...
-
-if __name__ == "__main__":
-    run(*rosie_rover.setup())
 ```
 
 Note this repo uses lowercase `run(...)` (not Team 24277's `Run(br)`) —
