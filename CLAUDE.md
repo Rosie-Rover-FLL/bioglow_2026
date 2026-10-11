@@ -321,3 +321,95 @@ unused, that's expected and fine).
 `m1.py` is the first mission built this way. To add `m2`, `m3`, etc.:
 repeat the conversion above, then in `rosie_rover_main.py` add `import m2`
 and add `2: m2.run` to the `MISSIONS` dict.
+
+## Running two motors at once (notes from 2026-10-03)
+
+How to move `left_top_motor` and `right_top_motor` together. Current
+missions are plain sync code, so options 2–4 work today; option 1 needs
+the async change described in the next section.
+
+1. `await multitask(left.run_angle(200, 180), right.run_angle(200, 180))` —
+   async only. Waits for **both**. This is what Pybricks **Blocks** uses for
+   parallel moves (Blocks has no `wait=False`).
+2. `left.run_angle(200, 180, wait=False)` then `right.run_angle(200, 180)` —
+   the pattern in `m2.py`. Only waits for the *right* motor; fine when both
+   do the same move.
+3. Both with `wait=False`, then
+   `while not (left.done() and right.done()): wait(10)` — best sync option
+   when the two moves differ.
+4. `left.run(200)`, `right.run_angle(200, 360)`, `left.stop()` — works, but
+   the left motor's final angle is only approximate (it just runs for as
+   long as the right takes, and `stop()` coasts). Use `hold()` instead of
+   `stop()` to lock it in place. Also possible in Blocks.
+
+Related facts:
+- `run_until_stalled(speed, then=Stop.COAST, duty_limit=None)` has **no
+  `wait` argument** — it always blocks — so options 2–4 can't run it on two
+  motors at once. Only `multitask` (async) or a sync `stalled()` polling
+  loop (like `straight_until_stalled`) can.
+- `run_angle` is relative ("turn 180° from here"); `run_target` is absolute
+  ("go to the 180° position"). `wait=False` is a separate choice that works
+  with either. A SPIKE motor's 0 starts at its built-in zero mark;
+  `reset_angle(0)` sets your own. Good arm pattern: `run_until_stalled` to
+  a hard stop, `reset_angle(0)`, then `run_target` for repeatable positions.
+- `run_angle`/`run_target` do not give up if blocked — the program can hang
+  on that line. Use stall-based moves where the arm might hit something.
+- `DriveBase.straight()`/`turn()`/`arc()` have **no stop-on-stall option**
+  (checked against the pybricks source + changelog). That's why
+  `rosie_rover.straight_until_stalled()` exists.
+
+## Planned (not done, untested): async/await missions
+
+Idea so a mission can be written like a Blocks program with `multitask`.
+**Not implemented yet** — David wanted it written down to try with the
+robot later. Test before relying on it.
+
+Change needed in `rosie_rover_main.py` (supports sync and async missions
+side by side, so missions can be converted one at a time):
+
+```python
+from pybricks.tools import run_task
+...
+result = run_mission(left_top_motor, right_top_motor, left_color_sensor,
+                     right_color_sensor, prime_hub, drive_base)
+if result is not None:   # async def run(...) returns a coroutine, not None
+    run_task(result)
+```
+
+A plain `def run(...)` mission runs on the call and returns `None`, so
+existing missions are unaffected. The menu loop, remote control, timer, and
+beeps all run outside `run_task` and don't change. Pybricks' docs say
+`run_task` calls can't be *nested*; calling it once per mission from the
+sync main loop should be fine.
+
+Example async mission (what `m2.py` could become):
+
+```python
+from pybricks.parameters import Stop
+from pybricks.tools import multitask
+
+
+async def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, prime_hub, drive_base):
+    await drive_base.straight(600)
+    await drive_base.turn(-100)
+    await drive_base.straight(20)
+    await multitask(
+        left_top_motor.run_until_stalled(500, Stop.COAST, 100),
+        right_top_motor.run_until_stalled(500, Stop.COAST, 100),
+    )
+    await drive_base.straight(-100)
+```
+
+Rules for async missions:
+- **Every move needs `await`.** Under `run_task`, a command without `await`
+  starts but doesn't wait — moves pile up silently. Biggest student trap.
+- Use `await wait(500)`, not `wait(500)`.
+- Sync helpers like `straight_until_stalled` won't work right inside an
+  async mission; it would need an async version.
+- Don't mix sync and async styles inside one mission file.
+
+To test on the hub before adopting:
+1. Calling `run_task` again for a second mission works (run an async
+   mission twice in a row).
+2. CENTER+BLUETOOTH stop during an async mission still exits cleanly and
+   the `finally` block still runs `stop_remote_motion()` / "Goodbye".
