@@ -43,10 +43,13 @@ deleted (2026-08-31) — everything worth keeping was folded into this file,
   `RosieRover` class before that): `setup()` builds the hub, drive motors,
   drive base, arm motors, and color sensors, and returns exactly six
   objects (`left_top_motor, right_top_motor, left_color_sensor,
-  right_color_sensor, prime_hub, drive_base`); `print_battery(prime_hub)`
-  and `straight_until_stalled(drive_base, distance)` are the other
-  functions. No mission imports here, so both `rosie_rover_main.py` and
-  mission files can import from it with zero circular-import risk.
+  right_color_sensor, prime_hub, drive_base`); `print_battery(prime_hub)`,
+  `straight_until_done_or_stalled(drive_base, distance)` (named
+  `straight_until_stalled` until 2026-10-12), and
+  `arm_until_done_or_stalled(left_top_motor, right_top_motor, speed,
+  angle)` are the other functions — the two `_until_done_or_stalled`
+  helpers are deliberately named as a parallel pair. No mission imports
+  here, so both `rosie_rover_main.py` and mission files can import from it with zero circular-import risk.
 - `m1.py`, `m2.py`, ... — one file per mission, each with a `run(left_top_motor,
   right_top_motor, left_color_sensor, right_color_sensor, prime_hub,
   drive_base)` function taking those same six params positionally (see
@@ -298,7 +301,7 @@ The coach (David) converts this into an `m<N>.py` mission module by hand:
   "__main__"` standalone block (removed 2026-09-18 to keep the m files
   simple; missions are run through `rosie_rover_main.py` instead). The only
   import a mission should need is a shared helper, e.g.
-  `from rosie_rover import straight_until_stalled` (added 2026-10-02).
+  `from rosie_rover import straight_until_done_or_stalled` (added 2026-10-02).
   **Why the helper exists**: `DriveBase.straight()` has no stop-on-stall
   option (checked against pybricks source + changelog, 2026-10-02), and
   `Motor.run_until_stalled()` is per-motor and blocking, so using it on
@@ -337,8 +340,9 @@ the async change described in the next section.
    do the same move.
 3. Both with `wait=False`, then
    `while not (left.done() and right.done()): wait(10)` — best sync option
-   when the two moves differ. **This is the team's chosen pattern**
-   (`m2.py` uses it).
+   when the two moves differ. **This is the team's chosen pattern**,
+   wrapped up (if either motor stalls, both stop — the top motors work as one unit, never stop just one) as
+   `rosie_rover.arm_until_done_or_stalled()` — `m2.py` uses it.
 4. `left.run(200)`, `right.run_angle(200, 360)`, `left.stop()` — works, but
    the left motor's final angle is only approximate (it just runs for as
    long as the right takes, and `stop()` coasts). Use `hold()` instead of
@@ -348,7 +352,7 @@ Related facts:
 - `run_until_stalled(speed, then=Stop.COAST, duty_limit=None)` has **no
   `wait` argument** — it always blocks — so options 2–4 can't run it on two
   motors at once. Only `multitask` (async) or a sync `stalled()` polling
-  loop (like `straight_until_stalled`) can.
+  loop (like `straight_until_done_or_stalled`) can.
 - `run_angle` is relative ("turn 180° from here"); `run_target` is absolute
   ("go to the 180° position"). `wait=False` is a separate choice that works
   with either. A SPIKE motor's 0 starts at its built-in zero mark;
@@ -358,7 +362,7 @@ Related facts:
   on that line. Use stall-based moves where the arm might hit something.
 - `DriveBase.straight()`/`turn()`/`arc()` have **no stop-on-stall option**
   (checked against the pybricks source + changelog). That's why
-  `rosie_rover.straight_until_stalled()` exists.
+  `rosie_rover.straight_until_done_or_stalled()` exists.
 
 ## Rejected for now: async/await missions
 
@@ -409,7 +413,7 @@ Rules for async missions:
 - **Every move needs `await`.** Under `run_task`, a command without `await`
   starts but doesn't wait — moves pile up silently. Biggest student trap.
 - Use `await wait(500)`, not `wait(500)`.
-- Sync helpers like `straight_until_stalled` won't work right inside an
+- Sync helpers like `straight_until_done_or_stalled` won't work right inside an
   async mission; it would need an async version.
 - Don't mix sync and async styles inside one mission file.
 

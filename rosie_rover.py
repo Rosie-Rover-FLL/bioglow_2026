@@ -28,11 +28,24 @@ def print_battery(prime_hub):
     print(f"Battery voltage: {prime_hub.battery.voltage()} mV")
 
 
-def straight_until_stalled(drive_base, distance):
+def straight_until_done_or_stalled(drive_base, distance):
     # Drive straight, but give up early if the robot gets stuck (stalls).
     drive_base.straight(distance, wait=False)
     while not drive_base.done():
         if drive_base.stalled():
             drive_base.stop()
+            break
+        wait(10)
+
+
+def arm_until_done_or_stalled(left_top_motor, right_top_motor, speed, angle):
+    # Turn both arm motors at the same time. The two motors work together,
+    # so if either one gets stuck (stalls), stop both and give up early.
+    left_top_motor.run_angle(speed, angle, wait=False)
+    right_top_motor.run_angle(speed, angle, wait=False)
+    while not (left_top_motor.done() and right_top_motor.done()):
+        if left_top_motor.stalled() or right_top_motor.stalled():
+            left_top_motor.stop()
+            right_top_motor.stop()
             break
         wait(10)

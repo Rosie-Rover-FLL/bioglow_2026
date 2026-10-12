@@ -1,22 +1,10 @@
-from pybricks.tools import wait
+from rosie_rover import arm_until_done_or_stalled
 
 
 def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, prime_hub, drive_base):
     drive_base.settings(straight_speed=450)
     drive_base.straight(265)
 
-    # Start both arm motors, then wait until each one is done OR stalled.
-    left_top_motor.run_angle(200, 180, wait=False)
-    right_top_motor.run_angle(200, 180, wait=False)
-    while not (
-        (left_top_motor.done() or left_top_motor.stalled())
-        and (right_top_motor.done() or right_top_motor.stalled())
-    ):
-        wait(10)
+    arm_until_done_or_stalled(left_top_motor, right_top_motor, 200, 180)
 
     drive_base.straight(-350)
-    left_top_motor.run_angle(200, -180, wait=False)
-    right_top_motor.run_angle(200, -180, wait=False)
-    while not (left_top_motor.done() and right_top_motor.done()):
-        wait(10)
-    
