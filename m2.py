@@ -15,7 +15,6 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
         wait(10)
 
     drive_base.straight(-350)
-
     left_top_motor.run_angle(200, -180, wait=False)
     right_top_motor.run_angle(200, -180, wait=False)
     while not (left_top_motor.done() and right_top_motor.done()):
