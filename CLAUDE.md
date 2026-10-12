@@ -202,7 +202,8 @@ just tilt reading (the robot doesn't read its own tilt).
   `prime_hub.system.set_stop_button(...)` so CENTER is free to use as "run"
   instead of "stop".
 - Shows a two-digit number on the hub display, starting at `1`.
-- RIGHT increments the number, LEFT decrements it (wraps between 0 and 99).
+- RIGHT increments the number, LEFT decrements it (wraps between 0 and
+  `MAX_MISSION`, currently 15 — the number of missions this season).
   `0` is reserved for remote control — never map a mission to it.
 - CENTER runs the mission mapped to the current number, via a `MISSIONS`
   dict (`{1: m1.run, ...}`) built from statically-imported mission modules.
@@ -332,11 +333,12 @@ the async change described in the next section.
    async only. Waits for **both**. This is what Pybricks **Blocks** uses for
    parallel moves (Blocks has no `wait=False`).
 2. `left.run_angle(200, 180, wait=False)` then `right.run_angle(200, 180)` —
-   the pattern in `m2.py`. Only waits for the *right* motor; fine when both
+   the pattern `m2.py` used before 2026-10-11. Only waits for the *right* motor; fine when both
    do the same move.
 3. Both with `wait=False`, then
    `while not (left.done() and right.done()): wait(10)` — best sync option
-   when the two moves differ.
+   when the two moves differ. **This is the team's chosen pattern**
+   (`m2.py` uses it).
 4. `left.run(200)`, `right.run_angle(200, 360)`, `left.stop()` — works, but
    the left motor's final angle is only approximate (it just runs for as
    long as the right takes, and `stop()` coasts). Use `hold()` instead of
@@ -358,11 +360,14 @@ Related facts:
   (checked against the pybricks source + changelog). That's why
   `rosie_rover.straight_until_stalled()` exists.
 
-## Planned (not done, untested): async/await missions
+## Rejected for now: async/await missions
 
-Idea so a mission can be written like a Blocks program with `multitask`.
-**Not implemented yet** — David wanted it written down to try with the
-robot later. Test before relying on it.
+**Decision (2026-10-11): David wants to avoid async/await.** It was tried
+briefly on `m2.py` and reverted the same day. Missions stay plain sync
+code, using option 3 above (both `wait=False`, then poll `done()`) to
+run two motors at once — `m2.py` is the example. The notes below are
+kept only for reference in case this is ever revisited; don't suggest
+it unprompted.
 
 Change needed in `rosie_rover_main.py` (supports sync and async missions
 side by side, so missions can be converted one at a time):

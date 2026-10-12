@@ -31,6 +31,9 @@ MISSIONS = {
     13: m13.run,
 }
 
+# Highest number the selector goes up to before wrapping back to 0.
+MAX_MISSION = 15
+
 MAX_TURN_RATE_DEGSEC = 200
 
 # Opposite checkerboard patterns, flashed when CENTER is pressed on a number
@@ -157,7 +160,7 @@ try:
 
         if Button.RIGHT in pressed:
             mission_number += 1
-            if mission_number > 99:
+            if mission_number > MAX_MISSION:
                 mission_number = 0
             prime_hub.display.number(mission_number)
             wait_for_release()
@@ -165,7 +168,7 @@ try:
         elif Button.LEFT in pressed:
             mission_number -= 1
             if mission_number < 0:
-                mission_number = 99
+                mission_number = MAX_MISSION
             prime_hub.display.number(mission_number)
             wait_for_release()
 
