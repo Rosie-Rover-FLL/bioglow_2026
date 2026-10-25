@@ -19,6 +19,8 @@ import m2
 import m3
 import m6
 import m13
+import m16
+import m17
 
 # Map mission numbers to their run functions. Add an entry here each time
 # a new mission module is imported above. Never map mission 0 -- that
@@ -29,10 +31,12 @@ MISSIONS = {
     3: m3.run,
     6: m6.run,
     13: m13.run,
+    16: m16.run,
+    17: m17.run,
 }
 
 # Highest number the selector goes up to before wrapping back to 0.
-MAX_MISSION = 15
+MAX_MISSION = 17
 
 MAX_TURN_RATE_DEGSEC = 200
 

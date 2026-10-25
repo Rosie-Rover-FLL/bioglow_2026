@@ -206,7 +206,7 @@ just tilt reading (the robot doesn't read its own tilt).
   instead of "stop".
 - Shows a two-digit number on the hub display, starting at `1`.
 - RIGHT increments the number, LEFT decrements it (wraps between 0 and
-  `MAX_MISSION`, currently 15 — the number of missions this season).
+  `MAX_MISSION`, currently 17 — the 15 season missions plus m16/m17, which just drive between launch areas).
   `0` is reserved for remote control — never map a mission to it.
 - CENTER runs the mission mapped to the current number, via a `MISSIONS`
   dict (`{1: m1.run, ...}`) built from statically-imported mission modules.
