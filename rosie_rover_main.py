@@ -19,6 +19,7 @@ import m2
 import m3
 import m6
 import m13
+import m15
 import m16
 import m17
 
@@ -31,6 +32,7 @@ MISSIONS = {
     3: m3.run,
     6: m6.run,
     13: m13.run,
+    15: m15.run,
     16: m16.run,
     17: m17.run,
 }
