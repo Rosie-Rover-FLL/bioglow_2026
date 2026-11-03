@@ -2,4 +2,5 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     # Left launch area -> right launch area in one big arc.
     # Aim at the Forest Elder (about 18 degrees toward the far wall).
     # Positive radius = curve to the right.
+    drive_base.settings(straight_speed=700)  # near max (742), leaves the outer wheel room on the arc
     drive_base.arc(3000, 36)

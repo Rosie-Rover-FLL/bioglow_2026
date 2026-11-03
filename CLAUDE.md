@@ -48,7 +48,26 @@ deleted (2026-08-31) — everything worth keeping was folded into this file,
   `straight_until_stalled` until 2026-10-12), and
   `arm_until_done_or_stalled(left_top_motor, right_top_motor, speed,
   angle)` are the other functions — the two `_until_done_or_stalled`
-  helpers are deliberately named as a parallel pair. No mission imports
+  helpers are deliberately named as a parallel pair.
+  m2's arm was too weak at `arm_until_done_or_stalled(..., 200, 180)`;
+  fixed 2026-11-03 by raising the speed to 950 deg/s (arm motors max out
+  at 1000 deg/s). A separate full-power `dc()` helper was tried and dropped
+  as too complex.
+  `reset_drive_settings(drive_base)` sets `DRIVE_SPEED_DEFAULT_MM_PER_S`,
+  `DRIVE_SPEED_ACCELERATION_MM_PER_S2`/`DRIVE_SPEED_DECELERATION_MM_PER_S2`, `TURN_RATE_DEFAULT_DEG_PER_S`,
+  `TURN_RATE_ACCELERATION_DEG_PER_S2`/`TURN_RATE_DECELERATION_DEG_PER_S2` (start accelerations are gentler
+  than default to cut wheel slip; stops stay at the Pybricks default), and `USE_GYRO` (off by
+  default; turning it on changes how far every tuned `turn()`/`arc()` goes).
+  `setup()` calls it once, and `rosie_rover_main.py` calls it before every
+  mission. **Mission order must not matter**: `drive_base.settings(...)`
+  carries over from one mission to the next in the same session, so this reset is what
+  keeps one mission's speed out of the next one. Missions may freely call
+  `drive_base.settings(...)`.
+  **Pybricks drive defaults** (from the firmware source, `pbio/src/drivebase.c` + `servo.c`, for
+  our SPIKE motors at 1000°/s max and 85 mm wheels): straight speed 297
+  mm/s (40% of max), max 742 mm/s (higher values get capped, so m1/m3's
+  800 really runs at 742), straight accel/decel 1113 mm/s², turn rate
+  258°/s (max 773°/s), turn accel/decel 1159°/s². The pybricks docs don't list these numbers. No mission imports
   here, so both `rosie_rover_main.py` and mission files can import from it with zero circular-import risk.
 - `m1.py`, `m2.py`, ... — one file per mission, each with a `run(left_top_motor,
   right_top_motor, left_color_sensor, right_color_sensor, prime_hub,

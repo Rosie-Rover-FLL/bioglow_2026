@@ -182,6 +182,7 @@ try:
             wait_for_release()
             run_mission = MISSIONS.get(mission_number)
             if run_mission:
+                rosie_rover.reset_drive_settings(drive_base)
                 rosie_rover.print_battery(prime_hub)
                 print(f"Starting Mission {mission_number:02}")
                 prime_hub.speaker.beep()
