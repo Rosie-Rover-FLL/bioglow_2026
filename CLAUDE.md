@@ -7,8 +7,8 @@ season. Our team is **Rosie Rover**, a brand-new team. We bootstrapped our
 approach by temporarily copying in a more experienced team's repo (**Team
 24277**, https://github.com/FLL-Team-24277) to learn their patterns. Those
 reference folders (`team_24277_code/`, `team_24277_vscode/`) have since been
-deleted (2026-08-31) — everything worth keeping was folded into this file,
-`requirements.txt`, and `help/`, with the rest intentionally left behind (see
+deleted (2026-08-31) — everything worth keeping was folded into this file
+and `requirements.txt`, with the rest intentionally left behind (see
 "Patterns learned from Team 24277" below for what was absorbed).
 
 - **Robot/hardware**: LEGO SPIKE Prime hub, driven with **Pybricks**
@@ -75,12 +75,10 @@ deleted (2026-08-31) — everything worth keeping was folded into this file,
   "Mission module conversion workflow" below).
 - `requirements.txt` — unpinned `pybricks`/`pybricksdev`; we deliberately
   track latest rather than pinning versions like Team 24277 did.
-- `help/` — reference docs worth keeping long-term: `discovery.md` (why
-  sharing mission code doesn't spoil FLL's Discovery core value) and
-  `training_videos.md` (VS Code/git/Python onboarding videos). Both
-  adapted/carried over from Team 24277 with attribution in the file.
-- `initial_testing/` — early scratch experiments (keyboard driving, a basic
-  menu, hello world). Nothing load-bearing here; safe to ignore/replace.
+- Removed 2026-11-03 as junk: `help/` (Discovery + training-video docs
+  from Team 24277), `initial_testing/` (early scratch experiments), and
+  `rosie_adjust.py` (unfinished, never-working position-nudge menu).
+  Recover from git history if ever needed.
 
 ## Patterns learned from Team 24277 (to reuse/adapt, not copy verbatim)
 
