@@ -26,4 +26,4 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     drive_base.straight(-100)
     drive_base.turn(-65)
     drive_base.arc(230, angle=65)
-    drive_base.straight(500)
+    straight_until_done_or_stalled(drive_base, 550)
