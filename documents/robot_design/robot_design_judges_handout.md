@@ -86,6 +86,9 @@ We might even be able to use the same arm for **Mission 7 Humongous Fungus**.
 
 <img src="images/m13_robot.jpg" width="250"> <img src="images/m13_card.jpg" width="140">
 
+**Keystone species:** a poison dart tree frog. It eats huge numbers of insects and is
+food for other animals, so it holds the food web together.
+
 **Attachment:** connects to the top motors with gears, and throws the
 keystone species onto the restoration platform.
 
@@ -102,7 +105,7 @@ Repeated test runs showed two problems:
 
 | Problem found in testing | Fix |
 |---|---|
-| Not enough power to raise the young trees | Added **weight** to the keystone species, and raised the throw from 75% to **100% power** |
+| Not enough power to raise the young trees | Added **weight** to the keystone species, started the attachment **farther back** for more momentum, and raised the throw from 75% to **100% power** |
 | The species sometimes missed the center of the platform | Drive out **slower** (300 mm/s) to stop wheel slip, but still drive back **fast** (600 mm/s) |
 
 <img src="images/m13_keystone_species.jpg" width="120">

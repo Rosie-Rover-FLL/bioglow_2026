@@ -195,6 +195,9 @@ We might even be able to use the same arm for **Mission 7 Humongous Fungus**.
 
 <img src="images/m13_robot.jpg" width="250"> <img src="images/m13_card.jpg" width="140">
 
+**Keystone species:** a poison dart tree frog. It eats huge numbers of insects and is
+food for other animals, so it holds the food web together.
+
 **Attachment:** connects to the top motors with gears, and throws the
 keystone species onto the restoration platform.
 
@@ -205,8 +208,10 @@ motors at 75% power for 0.4 seconds, then back up.
 
 ### 🎤 Jennie says (about 30 sec):
 
-> I wrote the code for **Mission 13, Keystone Species**. We have to get our keystone
-> species onto the restoration platform and raise the young trees. I wrote it in
+> I wrote the code for **Mission 13, Keystone Species**. Our keystone species is a
+> **poison dart tree frog**. It eats huge numbers of insects and is food for other
+> animals, so it holds the food web together. We have to get our frog onto the
+> restoration platform and raise the young trees. I wrote it in
 > Pybricks Blocks, and it's short. The robot drives forward 225 millimeters. Then
 > both top motors run at 75% power for less than half a second to **throw** our
 > species. Then the robot backs up.
@@ -233,7 +238,7 @@ Repeated test runs showed two problems:
 
 | Problem found in testing | Fix |
 |---|---|
-| Not enough power to raise the young trees | Added **weight** to the keystone species, and raised the throw from 75% to **100% power** |
+| Not enough power to raise the young trees | Added **weight** to the keystone species, started the attachment **farther back** for more momentum, and raised the throw from 75% to **100% power** |
 | The species sometimes missed the center of the platform | Drive out **slower** (300 mm/s) to stop wheel slip, but still drive back **fast** (600 mm/s) |
 
 <img src="images/m13_keystone_species.jpg" width="120">
@@ -257,8 +262,8 @@ drive_base.straight(-250)
 > We tested Mission 13 **over and over**, and testing showed two problems.
 >
 > **First**, there wasn't enough power to raise the young trees. So we made our
-> keystone species **heavier** *[hold it up]*, and we turned the throw up from 75%
-> to **100% power**.
+> keystone species **heavier** *[hold it up]*. We also start the attachment
+> **farther back**, so it has more momentum when it hits the target.
 >
 > **Second**, the species sometimes missed the center of the platform. The wheels
 > were slipping, so we made the robot drive out **slower**. It still drives back
@@ -340,3 +345,4 @@ Practice these out loud. Anyone can answer.
 - What would you change if you started over?
 - How did you decide who works on which mission?
 - What's your favorite mission and why?
+- What is your keystone species, and why is it a keystone species? *(The referee also asks this at the pre-match inspection.)*
