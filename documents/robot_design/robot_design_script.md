@@ -29,7 +29,7 @@ We have **5 minutes**. We go in the same order as the judges' Robot Design rubri
 | 6 | Create | Bowen | 0:15 | Page 5, hold up the attachment |
 | 7 | Iterate | Neala | 0:45 | Page 6, hold up the keystone species |
 | 8 | Communicate | Nolan | 0:45 | Page 7 |
-| 9 | Communicate | Myra | 0:10 | Page 7 (everyone stands together) |
+| 9 | Communicate | Mira | 0:10 | Page 7 (everyone stands together) |
 | | | | **≈ 5:15** | |
 
 ---
@@ -46,7 +46,7 @@ We have **5 minutes**. We go in the same order as the judges' Robot Design rubri
 | Design | **Miriam**, **James** | Mission 1 Drone Survey plan, motor-driven arm (Mission 2 Exploding Seeds, Mission 7 Humongous Fungus) |
 | Create | **Jennie** | Mission 13 Keystone Species code and attachment |
 | Iterate | **Neala** | How testing changed Mission 13 Keystone Species |
-| Communicate | **Nolan**, **Myra** | Lessons learned |
+| Communicate | **Nolan**, **Mira** | Lessons learned |
 
 <div style="page-break-after: always"></div>
 
@@ -276,7 +276,7 @@ drive_base.straight(-250)
 
 <div style="page-break-after: always"></div>
 
-## 8–9. COMMUNICATE: Lessons Learned (Nolan, then Myra)
+## 8–9. COMMUNICATE: Lessons Learned (Nolan, then Mira)
 
 *Rubric: "detailed explanation of process and lessons learned" and "team clearly shows
 pride or enthusiasm for their work."*
@@ -322,9 +322,9 @@ Impact, Inclusion, Teamwork, and Fun** to build it together.
 > got **230**, and last week **220**, which shows how much runs can change. Our goal
 > is **290**.
 >
-> Myra will finish for us.
+> Mira will finish for us.
 
-### 🎤 Myra says (about 10 sec):
+### 🎤 Mira says (about 10 sec):
 
 > We're really proud of Rosie Rover! As a brand-new team, we used **discovery,
 > innovation, impact, inclusion, teamwork,** and **fun** to build it together.

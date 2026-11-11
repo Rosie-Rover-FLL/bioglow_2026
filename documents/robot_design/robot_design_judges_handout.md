@@ -12,7 +12,7 @@
 | Design | **Miriam**, **James** | Mission 1 Drone Survey plan, motor-driven arm (Mission 2 Exploding Seeds, Mission 7 Humongous Fungus) |
 | Create | **Jennie** | Mission 13 Keystone Species code and attachment |
 | Iterate | **Neala** | How testing changed Mission 13 Keystone Species |
-| Communicate | **Nolan**, **Myra** | Lessons learned |
+| Communicate | **Nolan**, **Mira** | Lessons learned |
 
 ## Identify: Resources & the Robot Base (Bowen)
 
@@ -126,7 +126,7 @@ drive_base.straight(-250)
 
 <div style="page-break-after: always"></div>
 
-## Communicate: Lessons Learned (Nolan, Myra)
+## Communicate: Lessons Learned (Nolan, Mira)
 
 1. **A robot doesn't do the same thing every time.** The battery, where the robot is
    placed, and wheel slip all matter. The fixes: stall-detect code (if the robot gets stuck,
