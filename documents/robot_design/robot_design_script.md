@@ -173,6 +173,17 @@ We might even be able to use the same arm for **Mission 7 Humongous Fungus**.
 > drone, e.g. "We added ___ to the back so ___."]* I helped build it and code it,
 > and we tested it a lot.
 >
+> I decided to try to accomplish the drone survey (mission 1).
+> I built an attachment, but my first version did not work but when
+> tinkered with the attachment to make it better my second version worked.
+>  Here is my attachment.
+> The robot is turned so it is facing backwards and against the wall then it
+>  drives forward to push the red thing forward so the drone is in the air.
+>  I built the attachment, tested the robot, and measured how far it should go forward and backward.
+>  I tested and it worked 3 times in a row.
+> <img width="468" height="135" alt="image" src="https://github.com/user-attachments/assets/0f2d7737-f8c6-4d94-be4e-949eed9a2ada" />
+
+>
 > Now James will tell you about our arm.
 
 ### 🎤 James says (about 30 sec):
