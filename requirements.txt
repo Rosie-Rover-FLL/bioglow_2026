@@ -1,2 +1,3 @@
 pybricks
 pybricksdev
+pillow  # simulator/ only (draws the field animation), never runs on the hub
