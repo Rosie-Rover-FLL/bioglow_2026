@@ -81,28 +81,25 @@ We have **5 minutes**. We go in the same order as the judges' Robot Design rubri
 
 ### 🎤 Bowen says:
 
-> Hi! We are Rosie Robotics, Team 75872, and this is our robot, Rosie Rover.
+> Hi, my name is Bowen Fisher. We are Rosie Robotics, and I am here to present our
+> robot, the Rosie Rover.
 >
-> This is our **first year** in FIRST LEGO League. We're a rookie team. So before
-> we built anything, we went looking for advice from teams who have done this before.
+> This is our first year as a FIRST LEGO League team, so before starting any designs,
+> we asked for advice from teams that have done this in the past.
 >
-> We found a YouTube video called **"5 Simple Tips to Build the Ultimate FLL Robot."**
-> It taught us that experienced teams build one strong **robot base** first, and then
-> make small attachments for each mission. So that's what we did.
+> We found videos of ideas and robot designs. We found a video with a link to build a
+> robot base, and we used it to make most of the Rosie Rover we have today.
+> *[point to the top gears]* These are called **dog ears**. They run our entire
+> attachment system.
 >
-> I followed the video's tips for the base, and then I did my own design for the
-> outside panels. *[point to the yellow side walls]* *[CHECK: one sentence on why
-> you designed the outside this way]* It has two drive motors, **two more motors on
-> top** that can power any attachment, and two color sensors.
+> Instead of the SPIKE Prime app, we use **Pybricks**. We start with Blocks, then move
+> that code to **Python**. We wrote a main mission program that can run all of our
+> missions: the left and right buttons pick which mission, and the center button runs it.
 >
-> Instead of the regular LEGO SPIKE app, we use **Pybricks**. We start in Blocks,
-> then move to real **Python** code. We wrote a **mission menu**: left and right
-> pick a mission, center runs it.
+> We also built a **remote control** out of a second hub. We use it **only for testing**.
+> *[quick demo, about 5 seconds]*
 >
-> We also built a **remote control** out of a second hub, for driving practice and
-> testing attachments. *[quick demo, about 5 seconds]*
->
-> Next, Lina will tell you how we picked our missions.
+> Next, Lina will present how we picked our missions.
 
 **Bowen's notes (don't read out loud):**
 - If a judge asks "why Pybricks?": we can write Python, every mission lives in its own

@@ -15,3 +15,6 @@ MAX_ARM_DUTY_PCT = 70
 
 MODE_DRIVE = 0
 MODE_ATTACHMENT = 1
+# Wheel-lock mode on the remote, RIGHT not held: robot stops everything.
+# (Holding RIGHT while locked still sends MODE_ATTACHMENT as usual.)
+MODE_LOCKED = 2

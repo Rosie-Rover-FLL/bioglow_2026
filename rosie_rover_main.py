@@ -117,17 +117,46 @@ def clamp(value, low, high):
     return max(low, min(high, value))
 
 
+# True while the wheels are actively held in place by hold_wheels().
+wheels_held = False
+
+# Last remote message we acted on. The radio hands us the same message over
+# and over until the remote changes it, so we only send motor commands when
+# it's actually different -- no repeated drive/stop/hold calls.
+last_message = None
+
+
+def hold_wheels():
+    # drive_base.stop() only coasts, so the wheels can still roll a bit
+    # (momentum, or arm motion pushing the robot). hold() actively locks
+    # them at their current position. Only call it once per hold: every
+    # hold() re-targets to wherever the wheels are *now*, so calling it
+    # every loop would let them creep.
+    global wheels_held
+    if not wheels_held:
+        drive_base.hold()
+        wheels_held = True
+
+
 def stop_remote_motion():
+    global wheels_held, last_message
     drive_base.stop()
+    wheels_held = False
+    last_message = None
     left_top_motor.dc(0)
     right_top_motor.dc(0)
 
 
 def handle_remote():
+    global wheels_held, last_message
     received = radio.observe(REMOTE_BROADCAST_CHANNEL)
+    if received == last_message:
+        return  # nothing new (also covers "still no signal")
     if received is None:
+        # Signal just lost -- stop once.
         stop_remote_motion()
         return
+    last_message = received
 
     mode, speed_pct, pitch, roll = received
     # Measured on real hardware: tipping forward gives negative pitch, and
@@ -138,6 +167,7 @@ def handle_remote():
     power_limit = speed_pct / 100
 
     if mode == MODE_DRIVE:
+        wheels_held = False
         left_top_motor.dc(0)
         right_top_motor.dc(0)
         speed = MAX_DRIVE_SPEED_MMSEC * power_limit * tilt_forward
@@ -145,10 +175,15 @@ def handle_remote():
         drive_base.drive(speed, turn_rate)
 
     elif mode == MODE_ATTACHMENT:
-        drive_base.stop()
+        hold_wheels()
         arm_duty = MAX_ARM_DUTY_PCT * power_limit * tilt_forward
         left_top_motor.dc(arm_duty)
         right_top_motor.dc(arm_duty)
+
+    else:  # MODE_LOCKED (or anything unknown): nothing moves
+        hold_wheels()
+        left_top_motor.dc(0)
+        right_top_motor.dc(0)
 
 
 prime_hub.display.number(mission_number)
