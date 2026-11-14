@@ -114,6 +114,19 @@ rosie_rover.print_battery(prime_hub)
 # missions instead, so require CENTER+BLUETOOTH together to stop the program.
 prime_hub.system.set_stop_button((Button.CENTER, Button.BLUETOOTH))
 
+# Show "C" (calibrating) to remind us to keep the robot still while the gyro
+# calibrates. Pybricks recalibrates whenever the hub sits still for a few
+# seconds; imu.ready() turns True once it has. Show it for at least 1.5 s,
+# longer if the gyro isn't ready yet -- but give up after 5 s so a robot
+# that's being held or bumped can't get stuck on "C" forever.
+prime_hub.display.char("C")
+calibration_watch = StopWatch()
+while calibration_watch.time() < 1500 or not prime_hub.imu.ready():
+    if calibration_watch.time() > 5000:
+        print("Gyro not calibrated yet -- set the robot down and keep it still.")
+        break
+    wait(10)
+
 mission_number = 1
 
 

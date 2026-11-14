@@ -58,6 +58,10 @@ and `requirements.txt`, with the rest intentionally left behind (see
   `TURN_RATE_ACCELERATION_DEG_PER_S2`/`TURN_RATE_DECELERATION_DEG_PER_S2` (start accelerations are gentler
   than default to cut wheel slip; stops stay at the Pybricks default), and `USE_GYRO` (off by
   default; turning it on changes how far every tuned `turn()`/`arc()` goes).
+  Since 2026-11-13, mostly-straight missions turn the gyro on themselves
+  with `drive_base.use_gyro(True)` as the first line of `run()`: m1, m2,
+  m3, m5, m7, m13. m6, m15, m17 stay gyro-off (the reset turns it back off
+  before each mission, so this doesn't leak into other missions).
   `setup()` calls it once, and `rosie_rover_main.py` calls it before every
   mission. **Mission order must not matter**: `drive_base.settings(...)`
   carries over from one mission to the next in the same session, so this reset is what

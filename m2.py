@@ -3,6 +3,8 @@ from rosie_rover import arm_until_done_or_stalled
 
 
 def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, prime_hub, drive_base):
+    # Gyro on for this mission (reset to off before every mission).
+    drive_base.use_gyro(True)
     # Slow start (200 mm/s²) to avoid wheel slip, normal stop (800 mm/s²).
     drive_base.settings(straight_speed=450, straight_acceleration=(550, 800))
     drive_base.straight(285)
