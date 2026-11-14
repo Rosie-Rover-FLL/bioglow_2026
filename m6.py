@@ -1,8 +1,5 @@
-from rosie_rover import straight_until_done_or_stalled
+from rosie_rover import TEST_DELAY, straight_until_done_or_stalled
 from pybricks.tools import wait
-
-# Pause between moves while testing. Set to 0 to turn the pauses off.
-TEST_DELAY = 3000
 
 
 def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, prime_hub, drive_base):
@@ -21,7 +18,7 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     drive_base.settings(straight_speed=250)
     # Sets the rover speed to normal
     drive_base.turn(90)
-    straight_until_done_or_stalled(drive_base, 250)
+    straight_until_done_or_stalled(drive_base, 220)
     drive_base.settings(straight_speed=400)
     drive_base.straight(-100)
     drive_base.turn(-65)

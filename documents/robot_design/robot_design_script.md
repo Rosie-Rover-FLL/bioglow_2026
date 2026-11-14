@@ -19,18 +19,17 @@ We have **5 minutes**. We go in the same order as the judges' Robot Design rubri
 - When you finish, say the next person's name and step back.
 - After the 5 minutes, the judges ask questions. **Anyone** can answer.
 
-| # | Rubric | Speaker | Time | Judges' handout |
-|---|---|---|---|---|
-| 1 | Identify | Bowen | 1:30 | Pages 1–2 |
-| 2 | Identify | Lina | 0:25 | Page 3 |
-| 3 | Design | Miriam | 0:30 | Page 4 |
-| 4 | Design | James | 0:30 | Page 4 |
-| 5 | Create | Jennie | 0:30 | Page 5 |
-| 6 | Create | Bowen | 0:15 | Page 5, hold up the attachment |
-| 7 | Iterate | Neala | 0:45 | Page 6, hold up the keystone species |
-| 8 | Communicate | Nolan | 0:45 | Page 7 |
-| 9 | Communicate | Mira | 0:10 | Page 7 (everyone stands together) |
-| | | | **≈ 5:15** | |
+| # | Rubric | Speaker | Time | Judges' handout | Holding |
+|---|---|---|---|---|---|
+| 1 | Identify | Bowen | 1:30 | Pages 1–2 | The robot and the remote |
+| 2 | Identify | Lina | 0:25 | Page 3 | Just her script |
+| 3 | Design | Miriam | 0:30 | Page 4 | Mission 1 attachment |
+| 4 | Design | James | 0:30 | Page 4 | The arm |
+| 5 | Create | Jennie | 0:30 | Page 5 | Mission 13 attachment |
+| 6 | Iterate | Neala | 0:45 | Page 6 | The keystone species |
+| 7 | Communicate | Nolan | 0:45 | Page 7 | Nothing |
+| 8 | Communicate | Mira | 0:10 | Page 7 (everyone stands together) | Nothing |
+| | | | **≈ 5:05** | | |
 
 ---
 
@@ -78,6 +77,8 @@ We have **5 minutes**. We go in the same order as the judges' Robot Design rubri
   and holding a button moves the arm. Used for driving practice and testing attachments. (live demo)
 
   <img src="images/remote_and_robot.jpg" width="200">
+
+**Bowen is holding:** the robot and the remote.
 
 ### 🎤 Bowen says:
 
@@ -134,12 +135,14 @@ a launch area, with simple moves.
 | Precision tokens | 50 |
 | **Goal** | **290** |
 
+**Lina is holding:** just her script.
+
 ### 🎤 Lina says:
 
-> There are 15 missions, and nobody can do them all. As a rookie team, we picked
-> missions we can do **reliably**, and the **easiest points**: missions close to a
-> launch area, with simple moves. The map and the table show the missions we chose.
-> Our goal is **290 points**.
+> There are 15 missions, and no one can do them all. As a new team, we chose
+> missions that we can do **easily and reliably**, and that we could get **maximum
+> points** from without extremely complex navigation. The map and table show the
+> missions we chose. Our goal is to obtain around **290 points**.
 >
 > Now Miriam and James will tell you how we designed our attachments.
 
@@ -162,14 +165,10 @@ We might even be able to use the same arm for **Mission 7 Humongous Fungus**.
 
 <img src="images/m01_card.jpg" width="105"> <img src="images/m02_card.jpg" width="150"> <img src="images/m07_card.jpg" width="150">
 
+**Miriam is holding:** the Mission 1 attachment.
+
 ### 🎤 Miriam says (about 30 sec):
 
-> I worked on **Mission 1, Drone Survey**. Our plan was to use speed: the robot
-> drives **backward fast** and knocks the drone off the mat. Then it drives
-> straight home. *[CHECK: one sentence about the part of the robot that hits the
-> drone, e.g. "We added ___ to the back so ___."]* I helped build it and code it,
-> and we tested it a lot.
->
 > I decided to try to accomplish the drone survey (mission 1).
 > I built an attachment, but my first version did not work but when
 > tinkered with the attachment to make it better my second version worked.
@@ -183,6 +182,8 @@ We might even be able to use the same arm for **Mission 7 Humongous Fungus**.
 >
 > Now James will tell you about our arm.
 
+**James is holding:** the arm.
+
 ### 🎤 James says (about 30 sec):
 
 > I worked on **the arm**. Both top motors turn it together. For **Mission 2,
@@ -190,11 +191,11 @@ We might even be able to use the same arm for **Mission 7 Humongous Fungus**.
 > At first the arm was **too weak**, so we made it go much faster, and then it
 > worked. We might even be able to use the same arm for **Mission 7, Humongous Fungus**.
 >
-> Now Jennie will show you our code for Mission 13, Keystone Species.
+> Now Jennie will tell you about Mission 13, Keystone Species.
 
 <div style="page-break-after: always"></div>
 
-## 5–6. CREATE: Mission 13 Keystone Species (Jennie, then Bowen)
+## 5. CREATE: Mission 13 Keystone Species (Jennie)
 
 *Rubric: "clear explanation of innovative attachments and their purpose" and
 "clear explanation of innovative code and/or sensor use."*
@@ -214,29 +215,20 @@ motors at 75% power for 0.4 seconds, then back up.
 
 <img src="images/m13_blocks_v1.png" width="300">
 
+**Jennie is holding:** the Mission 13 attachment.
+
 ### 🎤 Jennie says (about 30 sec):
 
 > I wrote the code for **Mission 13, Keystone Species**. Our keystone species is a
-> **poison dart tree frog**. It eats huge numbers of insects and is food for other
-> animals, so it holds the food web together. We have to get our frog onto the
-> restoration platform and raise the young trees. I wrote it in
-> Pybricks Blocks, and it's short. The robot drives forward 225 millimeters. Then
-> both top motors run at 75% power for less than half a second to **throw** our
-> species. Then the robot backs up.
+> **poison dart tree frog**. It eats a lot of insects, and other animals eat it.
+> I also helped do **Mission 7, Mycelium**. They both involved the attachment.
+> *[hold up the attachment]*
 >
-> Bowen will show you the attachment.
-
-### 🎤 Bowen says (about 15 sec):
-
-> This is the Mission 13 attachment. *[hold it up]* The gears connect it to the
-> top motors, and it throws our keystone species onto the platform.
-> *[CHECK: one more sentence about what's special about it]*
->
-> Neala will tell you how testing changed it.
+> Neala will tell you how testing changed Mission 13.
 
 ---
 
-## 7. ITERATE: How Testing Changed Mission 13 Keystone Species (Neala, about 45 sec)
+## 6. ITERATE: How Testing Changed Mission 13 Keystone Species (Neala, about 45 sec)
 
 *Rubric: "repeated testing" and "improvements based on testing."*
 
@@ -265,6 +257,8 @@ drive_base.settings(straight_speed=600)   # ◀ NEW: fast drive home
 drive_base.straight(-250)
 ```
 
+**Neala is holding:** the keystone species.
+
 ### 🎤 Neala says:
 
 > We tested Mission 13 **over and over**, and testing showed two problems.
@@ -284,7 +278,7 @@ drive_base.straight(-250)
 
 <div style="page-break-after: always"></div>
 
-## 8–9. COMMUNICATE: Lessons Learned (Nolan, then Mira)
+## 7–8. COMMUNICATE: Lessons Learned (Nolan, then Mira)
 
 *Rubric: "detailed explanation of process and lessons learned" and "team clearly shows
 pride or enthusiasm for their work."*
@@ -315,6 +309,8 @@ Impact, Inclusion, Teamwork, and Fun** to build it together.
 
 *Thank you, judges!*
 
+**Nolan is holding:** nothing.
+
 ### 🎤 Nolan says (about 45 sec):
 
 > We learned three big things.
@@ -332,13 +328,15 @@ Impact, Inclusion, Teamwork, and Fun** to build it together.
 >
 > Mira will finish for us.
 
+**Mira is holding:** nothing.
+
 ### 🎤 Mira says (about 10 sec):
 
 > We're really proud of Rosie Rover! As a brand-new team, we used **discovery,
 > innovation, impact, inclusion, teamwork,** and **fun** to build it together.
-> Thank you, judges!
+> Thank you, judges! We're ready for your questions.
 
-*(Everyone smiles. Then we're ready for questions!)*
+*(Everyone smiles.)*
 
 ---
 

@@ -28,6 +28,11 @@ TURN_RATE_DECELERATION_DEG_PER_S2 = 1159  # Pybricks default
 # True = steer with the gyro. Re-test turns if you change this!
 USE_GYRO = False
 
+# Pause between moves while testing, ms. Set to 0 to turn the pauses off.
+# Shared by every mission that uses wait(TEST_DELAY).
+# TEST_DELAY = 3000
+TEST_DELAY = 0
+
 
 def setup():
     left_wheel = Motor(Port.D, Direction.COUNTERCLOCKWISE)

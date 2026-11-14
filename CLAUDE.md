@@ -63,6 +63,9 @@ and `requirements.txt`, with the rest intentionally left behind (see
   carries over from one mission to the next in the same session, so this reset is what
   keeps one mission's speed out of the next one. Missions may freely call
   `drive_base.settings(...)`.
+  `TEST_DELAY` (ms, 0 = off) is one shared constant for pausing between
+  moves while testing; missions do `from rosie_rover import TEST_DELAY` and
+  `wait(TEST_DELAY)` (moved here from per-file copies in m6/m7, 2026-11-11).
   **Pybricks drive defaults** (from the firmware source, `pbio/src/drivebase.c` + `servo.c`, for
   our SPIKE motors at 1000°/s max and 85 mm wheels): straight speed 297
   mm/s (40% of max), max 742 mm/s (higher values get capped, so m1/m3's
@@ -221,7 +224,10 @@ just tilt reading (the robot doesn't read its own tilt).
 - Reassigns the stop button to `(Button.CENTER, Button.BLUETOOTH)` via
   `prime_hub.system.set_stop_button(...)` so CENTER is free to use as "run"
   instead of "stop".
-- Shows a two-digit number on the hub display, starting at `1`.
+- Shows a two-digit number on the hub display, starting at `1`. Missions
+  in the `MISSION_ICONS` dict show an icon instead (currently only
+  `17: Icon.ARROW_UP`, added 2026-11-11); all display updates go through
+  `show_mission()`.
 - RIGHT increments the number, LEFT decrements it (wraps between 0 and
   `MAX_MISSION`, currently 17 — the 15 season missions plus m16/m17, which just drive between launch areas).
   `0` is reserved for remote control — never map a mission to it.

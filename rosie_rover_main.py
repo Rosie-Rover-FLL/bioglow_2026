@@ -1,5 +1,5 @@
 from pybricks.messaging import BLERadio
-from pybricks.parameters import Button
+from pybricks.parameters import Button, Icon
 from pybricks.tools import Matrix, StopWatch, wait
 
 import rosie_rover
@@ -17,6 +17,7 @@ from remote_protocol import (
 import m1
 import m2
 import m3
+import m5
 import m6
 import m7
 import m13
@@ -31,6 +32,7 @@ MISSIONS = {
     1: m1.run,
     2: m2.run,
     3: m3.run,
+    5: m5.run,
     6: m6.run,
     7: m7.run,
     13: m13.run,
@@ -76,6 +78,13 @@ PLAY_ICON = Matrix(
     ]
 )
 
+# Missions that show an icon instead of their number on the display.
+# m17 (drive to the other launch area) shows an arrow pointing toward the
+# front of the robot. It's still mission 17 everywhere else.
+MISSION_ICONS = {
+    17: Icon.ARROW_UP,
+}
+
 # Set to False for full volume; True for late-night/quiet testing.
 USE_LOW_VOLUME_BEEP = True
 
@@ -106,6 +115,14 @@ rosie_rover.print_battery(prime_hub)
 prime_hub.system.set_stop_button((Button.CENTER, Button.BLUETOOTH))
 
 mission_number = 1
+
+
+def show_mission(number):
+    icon = MISSION_ICONS.get(number)
+    if icon:
+        prime_hub.display.icon(icon)
+    else:
+        prime_hub.display.number(number)
 
 
 def wait_for_release():
@@ -186,7 +203,7 @@ def handle_remote():
         right_top_motor.dc(0)
 
 
-prime_hub.display.number(mission_number)
+show_mission(mission_number)
 
 try:
     while True:
@@ -205,14 +222,14 @@ try:
             mission_number += 1
             if mission_number > MAX_MISSION:
                 mission_number = 0
-            prime_hub.display.number(mission_number)
+            show_mission(mission_number)
             wait_for_release()
 
         elif Button.LEFT in pressed:
             mission_number -= 1
             if mission_number < 0:
                 mission_number = MAX_MISSION
-            prime_hub.display.number(mission_number)
+            show_mission(mission_number)
             wait_for_release()
 
         elif Button.CENTER in pressed:
@@ -242,7 +259,7 @@ try:
                 prime_hub.display.icon(CHECKER_B)
                 wait(500)
                 mission_number = max(MISSIONS)
-            prime_hub.display.number(mission_number)
+            show_mission(mission_number)
 
         if was_remote_active and mission_number != 0:
             stop_remote_motion()

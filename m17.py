@@ -10,7 +10,7 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     # drive_base.arc(-3000, 36)
 
     # Newer start on the wall
-    drive_base.arc(-280, 78, then=Stop.NONE)   # tight left turn to get off the wall
+    drive_base.arc(-300, 78, then=Stop.NONE)   # tight left turn to get off the wall
     drive_base.arc(-1600, 14, then=Stop.NONE)  # gentle left, up to the top of the hill
     drive_base.arc(-1250, 16, then=Stop.NONE)  # gentle left, heading down toward home
-    drive_base.straight(620)                    # straight into the left launch area
+    drive_base.straight(550)                    # straight into the left launch area
