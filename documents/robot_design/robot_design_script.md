@@ -82,23 +82,23 @@ We have **5 minutes**. We go in the same order as the judges' Robot Design rubri
 
 ### 🎤 Bowen says:
 
-> Hi, my name is Bowen Fisher. We are Rosie Robotics, and I am here to present our
-> robot, the Rosie Rover.
+> Hi, my name is Bowen Fisher, and I am here to present our robot, the Rosie Rover.
 >
 > This is our first year as a FIRST LEGO League team, so before starting any designs,
-> we asked for advice from teams that have done this in the past.
+> we asked advice from other teams that have done this in the past.
 >
-> We found videos of ideas and robot designs. We found a video with a link to build a
-> robot base, and we used it to make most of the Rosie Rover we have today.
-> *[point to the top gears]* These are called **dog ears**. They run our entire
+> We found videos of ideas and robot designs. We found a video with a robot base
+> building link. We made most of the Rosie Rover we have today.
+> *[point to the top gears]* These are called **dog ears**; they run our entire
 > attachment system.
 >
-> Instead of the SPIKE Prime app, we use **Pybricks**. We start with Blocks, then move
-> that code to **Python**. We wrote a main mission program that can run all of our
-> missions: the left and right buttons pick which mission, and the center button runs it.
+> <span style="color: #c00000">(Optional, say it or skip it:) Instead of the SPIKE Prime
+> app, we use Pybricks. We start with Blocks, then move that code to Python.</span>
+> We wrote a main mission code that can run all of our missions, with the left and
+> right buttons to control which mission and the center button to choose.
 >
-> We also built a **remote control** out of a second hub. We use it **only for testing**.
-> *[quick demo, about 5 seconds]*
+> We also built a **remote control** out of a second brick that allows us to control
+> the robot **IN TESTING ONLY** and **ONLY for TESTING**.
 >
 > Next, Lina will present how we picked our missions.
 
