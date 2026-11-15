@@ -313,28 +313,37 @@ Impact, Inclusion, Teamwork, and Fun** to build it together.
 
 ### 🎤 Nolan says (about 45 sec):
 
-> We learned three big things.
+> After testing our robot several times and occasionally making changes after each
+> run, we learned **3 main things**.
 >
-> **One:** a robot doesn't do the same thing every time. The battery, where you place
-> the robot, and wheel slip all change things.
+> **Firstly**, often the robot doesn't do the same thing every time. For example, if
+> you place the robot in a different place, even if the difference is very minor, you
+> can get completely different results. Also, sometimes the wheels would slip and
+> change the path of the robot, or the battery voltage could be different, which
+> changes the strength of the arm. We overcame these challenges by using the grid
+> marks to precisely place the robot before running it, and tweaking the program to
+> minimize the inconsistency.
 >
-> **Two:** precision tokens are worth protecting. Each time we touch the robot outside
-> home, it costs us a token. So sometimes it's smarter to let a mission fail.
+> **Secondly**, we learned the value of **precision tokens**. As I have discussed,
+> sometimes the robot will not do what you want it to. During practice runs, we
+> learned that it was sometimes smarter to let the mission fail and not lose a
+> precision token.
 >
-> **Three:** practice runs taught us the scoring. We fill out this score sheet at every
-> practice. Our first full run on October 11th scored **180**. On November 1st we
-> got **230**, and last week **220**, which shows how much runs can change. Our goal
-> is **290**.
+> **Lastly**, my group learned the value of **practice runs**. These runs helped us
+> simulate what the actual competition would be like, and they also taught us the
+> scoring system. Runs can change, as shown when you take into account that on our
+> first-ever full run on October 11th we got **180**, then **230** on November 1st,
+> and then last week we got **220**. We hope to get more than **290**.
 >
-> Mira will finish for us.
+> We'll have Mira finish for us.
 
 **Mira is holding:** nothing.
 
 ### 🎤 Mira says (about 10 sec):
 
-> We're really proud of Rosie Rover! As a brand-new team, we used **discovery,
-> innovation, impact, inclusion, teamwork,** and **fun** to build it together.
-> Thank you, judges! We're ready for your questions.
+> We're really proud of the work we did to program Rosie Rover! We're a brand new
+> team and we used **teamwork, inclusion, impact, fun, discovery,** and
+> **innovation** to build it together. Thank you.
 
 *(Everyone smiles.)*
 
@@ -346,7 +355,7 @@ Practice these out loud. Anyone can answer.
 
 - What was the hardest part of building the robot? How did you fix it?
 - Who did the coding? Did everyone code? *(Everyone should be able to say one thing they coded.)*
-- Do you use any sensors? *(We have two color sensors. CHECK: what we use them for)*
+- Do you use any sensors? *(We have two color sensors on the robot, but we don't use them. Our missions don't need them.)*
 - How do you make the robot start in the same place every time?
 - What would you change if you started over?
 - How did you decide who works on which mission?
