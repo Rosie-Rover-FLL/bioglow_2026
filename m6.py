@@ -18,7 +18,7 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     # Back away and window prep
     drive_base.settings(straight_speed=350)
     drive_base.straight(-110)
-    drive_base.turn(95)
+    drive_base.turn(96)
 
     # Hit the window
     straight_until_done_or_stalled(drive_base, 180)
