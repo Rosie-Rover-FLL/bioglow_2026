@@ -60,7 +60,7 @@ and `requirements.txt`, with the rest intentionally left behind (see
   default; turning it on changes how far every tuned `turn()`/`arc()` goes).
   Since 2026-11-13, mostly-straight missions turn the gyro on themselves
   with `drive_base.use_gyro(True)` as the first line of `run()`: m1, m2,
-  m3, m4, m5, m7, m13. m6, m15, m17 stay gyro-off (the reset turns it back off
+  m3, m4, m5, m7, m9, m13. m6, m15, m17 stay gyro-off (the reset turns it back off
   before each mission, so this doesn't leak into other missions).
   After every mission, `rosie_rover_main.py` calls `drive_base.stop()`
   (added 2026-11-15): the last move ends with `Stop.HOLD`, so without
