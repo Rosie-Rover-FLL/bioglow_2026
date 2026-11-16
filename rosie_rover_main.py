@@ -17,6 +17,7 @@ from remote_protocol import (
 import m1
 import m2
 import m3
+import m4
 import m5
 import m6
 import m7
@@ -32,6 +33,7 @@ MISSIONS = {
     1: m1.run,
     2: m2.run,
     3: m3.run,
+    4: m4.run,
     5: m5.run,
     6: m6.run,
     7: m7.run,
@@ -255,17 +257,40 @@ try:
                 prime_hub.speaker.beep()
                 prime_hub.display.icon(PLAY_ICON)
                 watch = StopWatch()
-                run_mission(
-                    left_top_motor,
-                    right_top_motor,
-                    left_color_sensor,
-                    right_color_sensor,
-                    prime_hub,
-                    drive_base,
-                )
+                # While a mission runs, CENTER alone is the stop button.
+                # Pressing it raises SystemExit inside the mission; we catch
+                # it here so it only aborts the mission and goes back to the
+                # menu instead of ending the whole program.
+                prime_hub.system.set_stop_button(Button.CENTER)
+                aborted = False
+                try:
+                    run_mission(
+                        left_top_motor,
+                        right_top_motor,
+                        left_color_sensor,
+                        right_color_sensor,
+                        prime_hub,
+                        drive_base,
+                    )
+                except SystemExit:
+                    aborted = True
+                finally:
+                    prime_hub.system.set_stop_button((Button.CENTER, Button.BLUETOOTH))
+                # The last move ends with Stop.HOLD, so the drive base keeps
+                # holding its position (and heading, if the gyro is on). Let
+                # go so the robot can be picked up and moved freely. After an
+                # abort, this also stops whatever was still moving (the
+                # program didn't end, so the firmware won't do it for us).
+                stop_remote_motion()
                 elapsed_sec = watch.time() / 1000
                 prime_hub.speaker.beep()
-                print(f"Finished Mission {mission_number:02}, time {elapsed_sec:.1f} seconds")
+                if aborted:
+                    print(f"Aborted Mission {mission_number:02}, time {elapsed_sec:.1f} seconds")
+                    # CENTER is probably still held down -- wait so it
+                    # doesn't immediately launch the mission again.
+                    wait_for_release()
+                else:
+                    print(f"Finished Mission {mission_number:02}, time {elapsed_sec:.1f} seconds")
             else:
                 prime_hub.display.icon(CHECKER_A)
                 wait(500)

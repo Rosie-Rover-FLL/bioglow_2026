@@ -7,7 +7,7 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     drive_base.use_gyro(True)
     drive_base.straight(735)
     wait(TEST_DELAY)
-    drive_base.turn(-24)
+    drive_base.turn(-27)
     wait(TEST_DELAY)
     left_top_motor.dc(100)
     right_top_motor.dc(100)

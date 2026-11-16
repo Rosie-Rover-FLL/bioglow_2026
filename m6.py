@@ -3,7 +3,8 @@ from pybricks.tools import wait
 
 
 def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, prime_hub, drive_base):
-    drive_base.settings(straight_speed=200)
+    drive_base.settings(straight_speed=500)
+    drive_base.use_gyro(True)
     # Sets the rover speed to normal
     drive_base.straight(550)
     drive_base.arc(23, angle=65)
@@ -18,9 +19,10 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     drive_base.settings(straight_speed=250)
     # Sets the rover speed to normal
     drive_base.turn(90)
-    straight_until_done_or_stalled(drive_base, 220)
+    straight_until_done_or_stalled(drive_base, 180)
     drive_base.settings(straight_speed=400)
     drive_base.straight(-100)
     drive_base.turn(-65)
     drive_base.arc(230, angle=85)
     straight_until_done_or_stalled(drive_base, 550)
+    drive_base.use_gyro(False)

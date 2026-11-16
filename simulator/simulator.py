@@ -387,9 +387,17 @@ def _kw(then, wait):
 
 # --- Fake motors, sensors, hub ---------------------------------------------
 
+class FakeControl:
+    # motor.control.limits(...) -- accepted and ignored (the simulator
+    # doesn't model motor acceleration).
+    def limits(self, speed=None, acceleration=None, torque=None):
+        return (MOTOR_MAX_DEG_S, 2000, 200)
+
+
 class FakeMotor:
     def __init__(self, name):
         self.name = name
+        self.control = FakeControl()
         # (start ms, start angle, deg/s, end ms)
         self.moves = [(0.0, 0.0, 0.0, 0.0)]
 

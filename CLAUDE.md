@@ -60,8 +60,12 @@ and `requirements.txt`, with the rest intentionally left behind (see
   default; turning it on changes how far every tuned `turn()`/`arc()` goes).
   Since 2026-11-13, mostly-straight missions turn the gyro on themselves
   with `drive_base.use_gyro(True)` as the first line of `run()`: m1, m2,
-  m3, m5, m7, m13. m6, m15, m17 stay gyro-off (the reset turns it back off
+  m3, m4, m5, m7, m13. m6, m15, m17 stay gyro-off (the reset turns it back off
   before each mission, so this doesn't leak into other missions).
+  After every mission, `rosie_rover_main.py` calls `drive_base.stop()`
+  (added 2026-11-15): the last move ends with `Stop.HOLD`, so without
+  this the robot kept holding its position and gyro heading, and pushed back
+  when turned by hand. Missions don't need their own `use_gyro(False)` at the end.
   `setup()` calls it once, and `rosie_rover_main.py` calls it before every
   mission. **Mission order must not matter**: `drive_base.settings(...)`
   carries over from one mission to the next in the same session, so this reset is what
@@ -243,6 +247,12 @@ just tilt reading (the robot doesn't read its own tilt).
   so a dynamically-computed import (e.g. `__import__(f"m{n}")`) would not
   get transferred to the hub.
 - After a mission runs, the same number stays displayed so it can be rerun.
+- **CENTER aborts a running mission** (added 2026-11-15, untested on hub
+  as of writing): during `run_mission(...)` the stop button is switched to
+  CENTER alone, and the `SystemExit` it raises is caught so the robot just
+  goes back to the menu instead of the program ending. Then the stop button
+  goes back to CENTER+BLUETOOTH. `stop_remote_motion()` runs afterward to
+  stop all motors, since the firmware only does that when the program ends.
 - If CENTER is pressed on a number with no mission mapped, the hub flashes a
   checkerboard pattern (and its inverse) on the 5x5 display for 0.5s each,
   then jumps to `max(MISSIONS)` — the highest mission number that actually
