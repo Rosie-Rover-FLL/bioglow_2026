@@ -6,14 +6,14 @@
 
 | # | Rubric | Speaker | Time | Judges' handout | Holding |
 |---|---|---|---|---|---|
-| 1 | Identify | Bowen | 1:15 | Page 2 | The robot and the remote |
-| 2 | Identify | Lina | 0:30 | Page 3 | Just her script |
-| 3 | Design | Miriam | 0:45 | Page 4 | Mission 1 attachment |
-| 4 | Design | James | 0:35 | Page 4 | The arm |
-| 5 | Create | Jennie | 0:25 | Page 5 | Mission 13 attachment |
-| 6 | Iterate | Neala | 0:50 | Page 6 | The keystone species |
-| 7 | Communicate | Nolan | 1:45 | Page 7 | Nothing |
-| 8 | Communicate | Mira | 0:15 | Page 7 (everyone stands together) | Nothing |
+| 1 | Identify | Bowen | 1:15 | Page 2 | Script, the robot, and the remote |
+| 2 | Identify | Lina | 0:30 | Page 3 | Script |
+| 3 | Design | Miriam | 0:45 | Page 4 | Script, Mission 1 attachment |
+| 4 | Design | James | 0:35 | Page 4 | Script, the arm |
+| 5 | Create | Jennie | 0:25 | Page 5 | Script, Mission 13 attachment |
+| 6 | Iterate | Neala | 0:50 | Page 6 | Script, the keystone species |
+| 7 | Communicate | Nolan | 1:45 | Page 7 | Script |
+| 8 | Communicate | Mira | 0:15 | Page 7 (everyone stands together) | Script |
 | | | | **≈ 6:20** | | |
 
 <div style="page-break-after: always"></div>
@@ -57,18 +57,18 @@
 
   <img src="images/remote_and_robot.jpg" width="200">
 
-**Bowen is holding:** the robot and the remote.
+**Bowen is holding:** his script, the robot, and the remote.
 
 ### 🎤 Bowen says:
 
-> Hi, my name is Bowen Fisher, and I am here to present our robot, the Rosie Rover.
+> Hi, my name is Bowen Fisher, and we are here to present our robot, the Rosie Rover.
 >
 > This is our first year as a FIRST LEGO League team, so before starting any designs,
 > we asked advice from other teams that have done this in the past.
 >
-> We found videos of ideas and robot designs. We found a video with a robot base
-> building link. We made most of the Rosie Rover we have today.
-> *[point to the top gears]* These are called **dog ears**; they run our entire
+> We found videos of ideas and robot designs.
+> Then we modified those to make them our own. It has two drive motors for the wheels and
+> *[point to the top gears]* these are called **dog ears**; they run our entire
 > attachment system.
 >
 > <span style="color: #c00000">(Optional, say it or skip it:) Instead of the SPIKE Prime
@@ -112,7 +112,7 @@ a launch area, with simple moves.
 | Precision tokens | 50 |
 | **Goal** | **290** |
 
-**Lina is holding:** just her script.
+**Lina is holding:** her script.
 
 ### 🎤 Lina says:
 
@@ -140,7 +140,7 @@ We might even be able to use the same arm for **Mission 7 Humongous Fungus**.
 
 <img src="images/m01_card.jpg" width="105"> <img src="images/m02_card.jpg" width="150"> <img src="images/m07_card.jpg" width="150">
 
-**Miriam is holding:** the Mission 1 attachment.
+**Miriam is holding:** her script and the Mission 1 attachment.
 
 ### 🎤 Miriam says (about 45 sec):
 
@@ -157,7 +157,7 @@ We might even be able to use the same arm for **Mission 7 Humongous Fungus**.
 >
 > Now James will tell you about our arm.
 
-**James is holding:** the arm.
+**James is holding:** his script and the arm.
 
 ### 🎤 James says (about 35 sec):
 
@@ -187,7 +187,7 @@ motors at 75% power for 0.4 seconds, then back up.
 
 <img src="images/m13_blocks_v1.png" width="300">
 
-**Jennie is holding:** the Mission 13 attachment.
+**Jennie is holding:** her script and the Mission 13 attachment.
 
 ### 🎤 Jennie says (about 25 sec):
 
@@ -227,7 +227,7 @@ drive_base.settings(straight_speed=600)   # ◀ NEW: fast drive home
 drive_base.straight(-250)
 ```
 
-**Neala is holding:** the keystone species.
+**Neala is holding:** her script and the keystone species.
 
 ### 🎤 Neala says:
 
@@ -276,7 +276,7 @@ Impact, Inclusion, Teamwork, and Fun** to build it together.
 
 *Thank you, judges!*
 
-**Nolan is holding:** nothing.
+**Nolan is holding:** his script.
 
 ### 🎤 Nolan says (about 1 min 45 sec):
 
@@ -304,7 +304,7 @@ Impact, Inclusion, Teamwork, and Fun** to build it together.
 >
 > We'll have Mira finish for us.
 
-**Mira is holding:** nothing.
+**Mira is holding:** her script.
 
 ### 🎤 Mira says (about 15 sec):
 

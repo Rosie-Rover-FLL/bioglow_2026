@@ -146,4 +146,4 @@ The score sheet used at every practice run:
 **Proud of Rosie Rover!** As a brand-new team, we used **Discovery, Innovation,
 Impact, Inclusion, Teamwork, and Fun** to build it together.
 
-*Thank you, judges!*
+*Thank you!*
