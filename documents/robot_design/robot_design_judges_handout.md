@@ -2,11 +2,11 @@
 
 # Rosie Robotics, Team #75872: Robot Design
 
-**Rookie team · 2026 FLL Challenge: Bioglow · Robot: Rosie Rover · Coded in Pybricks (Blocks to Python)**
+**Rookie team · Robot: Rosie Rover · Coded in Pybricks (Blocks to Python)**
 
 <img src="images/team_first_meeting.jpg" width="300"> <img src="images/base_finished.jpg" width="185">
 
-| Rubric | Who's talking | What we'll show |
+| Rubric | Speaker | What we'll show |
 |---|---|---|
 | Identify | **Bowen**, **Lina** | Resources used, robot base, Pybricks + remote, mission strategy |
 | Design | **Miriam**, **James** | Mission 1 Drone Survey plan, motor-driven arm (Mission 2 Exploding Seeds, Mission 7 Humongous Fungus) |
@@ -14,22 +14,18 @@
 | Iterate | **Neala** | How testing changed Mission 13 Keystone Species |
 | Communicate | **Nolan**, **Mira** | Lessons learned |
 
+<div style="page-break-after: always"></div>
+
 ## Identify: Resources & the Robot Base (Bowen)
 
 - **As a rookie team, we started by learning from veteran teams.** The YouTube video
   *"5 Simple Tips to Build the Ultimate FLL Robot"* recommends building one strong
   **base robot** first, then small attachments for each mission.
 - **Base:** built following the video's tips, then finished with an original design for the outside panels.
-  It has 2 drive motors, **2 attachment motors on top**, and 2 color sensors.
+  It has 2 drive motors, 2 attachment motors on top, and 2 color sensors.
   We made a Pybricks template program for this setup.
 
   <img src="images/base_build_side_panels.jpg" width="200"> <img src="images/setup_template_blocks.png" width="230">
-
-<div style="page-break-after: always"></div>
-
-- **Pybricks instead of the regular SPIKE app:** missions start in Pybricks Blocks, then
-  move to Python. Each mission is its own file, and all the code is on GitHub (https://github.com/Rosie-Rover-FLL/bioglow_2026).
-
   <img src="images/m03_blocks_and_python.png" width="400">
 
 - **Mission menu on the hub:** press left/right to pick a mission number, center to run it.
@@ -76,7 +72,7 @@ the drone off the mat, then drives straight home.
 so the speed went way up. The arm lowers again on the way home, ready for the next run.
 We might even be able to use the same arm for **Mission 7 Humongous Fungus**.
 
-<img src="images/m01_robot.jpg" width="190"> <img src="images/m02_robot_arm_up.jpg" width="145">
+<img src="images/m01_robot.jpg" width="190"> <img src="images/m02_robot_arm_up.jpg" width="145"> <img src="images/m01_on_table.jpg" width="250">
 
 <img src="images/m01_card.jpg" width="105"> <img src="images/m02_card.jpg" width="150"> <img src="images/m07_card.jpg" width="150">
 

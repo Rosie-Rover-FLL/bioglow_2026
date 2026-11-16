@@ -4,42 +4,27 @@
 
 **Rosie Robotics, Team #75872 · Robot: Rosie Rover**
 
-This copy has **everything on the judges' handout**, plus the rubric and **what each
-person says**. The judges' handout has the same pictures and tables, so when you point
-at something here, the judges can find it on their copy.
-
-We have **5 minutes**. We go in the same order as the judges' Robot Design rubric:
-**Identify → Design → Create → Iterate → Communicate**.
-
-**Tips for everyone**
-
-- It's fine to read your words. Look up at the judges between sentences.
-- Talk slower than feels normal, and loud enough for the back of the room.
-- Hold up the robot, or point at the picture, when your part mentions it.
-- When you finish, say the next person's name and step back.
-- After the 5 minutes, the judges ask questions. **Anyone** can answer.
-
 | # | Rubric | Speaker | Time | Judges' handout | Holding |
 |---|---|---|---|---|---|
-| 1 | Identify | Bowen | 1:30 | Pages 1–2 | The robot and the remote |
-| 2 | Identify | Lina | 0:25 | Page 3 | Just her script |
-| 3 | Design | Miriam | 0:30 | Page 4 | Mission 1 attachment |
-| 4 | Design | James | 0:30 | Page 4 | The arm |
-| 5 | Create | Jennie | 0:30 | Page 5 | Mission 13 attachment |
-| 6 | Iterate | Neala | 0:45 | Page 6 | The keystone species |
-| 7 | Communicate | Nolan | 0:45 | Page 7 | Nothing |
-| 8 | Communicate | Mira | 0:10 | Page 7 (everyone stands together) | Nothing |
-| | | | **≈ 5:05** | | |
+| 1 | Identify | Bowen | 1:15 | Page 2 | The robot and the remote |
+| 2 | Identify | Lina | 0:30 | Page 3 | Just her script |
+| 3 | Design | Miriam | 0:45 | Page 4 | Mission 1 attachment |
+| 4 | Design | James | 0:35 | Page 4 | The arm |
+| 5 | Create | Jennie | 0:25 | Page 5 | Mission 13 attachment |
+| 6 | Iterate | Neala | 0:50 | Page 6 | The keystone species |
+| 7 | Communicate | Nolan | 1:45 | Page 7 | Nothing |
+| 8 | Communicate | Mira | 0:15 | Page 7 (everyone stands together) | Nothing |
+| | | | **≈ 6:20** | | |
 
----
+<div style="page-break-after: always"></div>
 
-## Judges' handout, page 1 (top)
+## Judges' handout, page 1
 
-**Rookie team · 2026 FLL Challenge: Bioglow · Robot: Rosie Rover · Coded in Pybricks (Blocks to Python)**
+**Rookie team · Robot: Rosie Rover · Coded in Pybricks (Blocks to Python)**
 
 <img src="images/team_first_meeting.jpg" width="300"> <img src="images/base_finished.jpg" width="185">
 
-| Rubric | Who's talking | What we'll show |
+| Rubric | Speaker | What we'll show |
 |---|---|---|
 | Identify | **Bowen**, **Lina** | Resources used, robot base, Pybricks + remote, mission strategy |
 | Design | **Miriam**, **James** | Mission 1 Drone Survey plan, motor-driven arm (Mission 2 Exploding Seeds, Mission 7 Humongous Fungus) |
@@ -49,9 +34,7 @@ We have **5 minutes**. We go in the same order as the judges' Robot Design rubri
 
 <div style="page-break-after: always"></div>
 
-## 1. IDENTIFY: Resources & the Robot Base (Bowen, about 1 min 30 sec)
-
-*Rubric: "explored building and coding resources, and sought guidance as needed."*
+## 1. IDENTIFY: Resources & the Robot Base (Bowen, about 1 min 15 sec)
 
 **On the judges' handout:**
 
@@ -59,14 +42,10 @@ We have **5 minutes**. We go in the same order as the judges' Robot Design rubri
   *"5 Simple Tips to Build the Ultimate FLL Robot"* recommends building one strong
   **base robot** first, then small attachments for each mission.
 - **Base:** built following the video's tips, then finished with an original design for the outside panels.
-  It has 2 drive motors, **2 attachment motors on top**, and 2 color sensors.
+  It has 2 drive motors, 2 attachment motors on top, and 2 color sensors.
   We made a Pybricks template program for this setup.
 
   <img src="images/base_build_side_panels.jpg" width="200"> <img src="images/setup_template_blocks.png" width="230">
-
-- **Pybricks instead of the regular SPIKE app:** missions start in Pybricks Blocks, then
-  move to Python. Each mission is its own file, and all the code is on GitHub (https://github.com/Rosie-Rover-FLL/bioglow_2026).
-
   <img src="images/m03_blocks_and_python.png" width="400">
 
 - **Mission menu on the hub:** press left/right to pick a mission number, center to run it.
@@ -109,9 +88,7 @@ We have **5 minutes**. We go in the same order as the judges' Robot Design rubri
 
 <div style="page-break-after: always"></div>
 
-## 2. IDENTIFY: Mission Strategy (Lina, about 25 sec)
-
-*Rubric: "determined which missions to attempt" (mission strategy).*
+## 2. IDENTIFY: Mission Strategy (Lina, about 30 sec)
 
 **On the judges' handout:**
 
@@ -150,8 +127,6 @@ a launch area, with simple moves.
 
 ## 3–4. DESIGN: Mission 1 Drone Survey and the Arm (Miriam and James)
 
-*Rubric: "all team members contributed ideas" and "building and coding skills in all team members."*
-
 **On the judges' handout:**
 
 **Mission 1 Drone Survey (Miriam):** the robot drives backward fast to knock
@@ -161,13 +136,13 @@ the drone off the mat, then drives straight home.
 so the speed went way up. The arm lowers again on the way home, ready for the next run.
 We might even be able to use the same arm for **Mission 7 Humongous Fungus**.
 
-<img src="images/m01_robot.jpg" width="190"> <img src="images/m02_robot_arm_up.jpg" width="145">
+<img src="images/m01_robot.jpg" width="190"> <img src="images/m02_robot_arm_up.jpg" width="145"> <img src="images/m01_on_table.jpg" width="250">
 
 <img src="images/m01_card.jpg" width="105"> <img src="images/m02_card.jpg" width="150"> <img src="images/m07_card.jpg" width="150">
 
 **Miriam is holding:** the Mission 1 attachment.
 
-### 🎤 Miriam says (about 30 sec):
+### 🎤 Miriam says (about 45 sec):
 
 > I decided to try to accomplish the drone survey (mission 1).
 > I built an attachment, but my first version did not work but when
@@ -184,7 +159,7 @@ We might even be able to use the same arm for **Mission 7 Humongous Fungus**.
 
 **James is holding:** the arm.
 
-### 🎤 James says (about 30 sec):
+### 🎤 James says (about 35 sec):
 
 > I worked on **the arm**. Both top motors turn it together. For **Mission 2,
 > Exploding Seeds**, the robot drives up and lifts the arm to knock the seeds off.
@@ -196,9 +171,6 @@ We might even be able to use the same arm for **Mission 7 Humongous Fungus**.
 <div style="page-break-after: always"></div>
 
 ## 5. CREATE: Mission 13 Keystone Species (Jennie)
-
-*Rubric: "clear explanation of innovative attachments and their purpose" and
-"clear explanation of innovative code and/or sensor use."*
 
 **On the judges' handout:**
 
@@ -217,7 +189,7 @@ motors at 75% power for 0.4 seconds, then back up.
 
 **Jennie is holding:** the Mission 13 attachment.
 
-### 🎤 Jennie says (about 30 sec):
+### 🎤 Jennie says (about 25 sec):
 
 > I wrote the code for **Mission 13, Keystone Species**. Our keystone species is a
 > **poison dart tree frog**. It eats a lot of insects, and other animals eat it.
@@ -226,11 +198,9 @@ motors at 75% power for 0.4 seconds, then back up.
 >
 > Neala will tell you how testing changed Mission 13.
 
----
+<div style="page-break-after: always"></div>
 
-## 6. ITERATE: How Testing Changed Mission 13 Keystone Species (Neala, about 45 sec)
-
-*Rubric: "repeated testing" and "improvements based on testing."*
+## 6. ITERATE: How Testing Changed Mission 13 Keystone Species (Neala, about 50 sec)
 
 **On the judges' handout:**
 
@@ -280,9 +250,6 @@ drive_base.straight(-250)
 
 ## 7–8. COMMUNICATE: Lessons Learned (Nolan, then Mira)
 
-*Rubric: "detailed explanation of process and lessons learned" and "team clearly shows
-pride or enthusiasm for their work."*
-
 **On the judges' handout:**
 
 1. **A robot doesn't do the same thing every time.** The battery, where the robot is
@@ -311,7 +278,7 @@ Impact, Inclusion, Teamwork, and Fun** to build it together.
 
 **Nolan is holding:** nothing.
 
-### 🎤 Nolan says (about 45 sec):
+### 🎤 Nolan says (about 1 min 45 sec):
 
 > After testing our robot several times and occasionally making changes after each
 > run, we learned **3 main things**.
@@ -339,7 +306,7 @@ Impact, Inclusion, Teamwork, and Fun** to build it together.
 
 **Mira is holding:** nothing.
 
-### 🎤 Mira says (about 10 sec):
+### 🎤 Mira says (about 15 sec):
 
 > We're really proud of the work we did to program Rosie Rover! We're a brand new
 > team and we used **teamwork, inclusion, impact, fun, discovery,** and
