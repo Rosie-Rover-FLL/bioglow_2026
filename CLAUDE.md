@@ -65,7 +65,9 @@ and `requirements.txt`, with the rest intentionally left behind (see
   After every mission, `rosie_rover_main.py` calls `drive_base.stop()`
   (added 2026-11-15): the last move ends with `Stop.HOLD`, so without
   this the robot kept holding its position and gyro heading, and pushed back
-  when turned by hand. Missions don't need their own `use_gyro(False)` at the end.
+  when turned by hand. It also calls `drive_base.use_gyro(False)` after every
+  mission (added 2026-11-16) so remote control (mission 0) always drives
+  gyro-off. Missions don't need their own `use_gyro(False)` at the end.
   `setup()` calls it once, and `rosie_rover_main.py` calls it before every
   mission. **Mission order must not matter**: `drive_base.settings(...)`
   carries over from one mission to the next in the same session, so this reset is what

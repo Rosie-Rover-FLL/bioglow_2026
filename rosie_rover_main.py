@@ -282,6 +282,9 @@ try:
                 # abort, this also stops whatever was still moving (the
                 # program didn't end, so the firmware won't do it for us).
                 stop_remote_motion()
+                # Some missions turn the gyro on. Turn it back off so remote
+                # control (mission 0) always drives with the gyro off.
+                drive_base.use_gyro(False)
                 elapsed_sec = watch.time() / 1000
                 prime_hub.speaker.beep()
                 if aborted:
