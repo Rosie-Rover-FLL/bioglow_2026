@@ -8,13 +8,11 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     drive_base.straight(700)
     drive_base.arc(-120, angle=50)
 
-    # Raise the arm with everything maxed out (same as m2): full speed
-    # (1000 deg/s) and the firmware's highest start/stop acceleration
-    # (20000 deg/s², default is 2000).
+    # Raise the arm at max speed and acceleration.
     left_top_motor.control.limits(acceleration=20000)
     right_top_motor.control.limits(acceleration=20000)
     arm_until_done_or_stalled(left_top_motor, right_top_motor, 1000, 200)
-    # Back to the default so other missions aren't affected.
+    # Back to the default acceleration.
     left_top_motor.control.limits(acceleration=2000)
     right_top_motor.control.limits(acceleration=2000)
 

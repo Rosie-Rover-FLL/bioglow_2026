@@ -10,7 +10,6 @@ M7_ARM_RAISE_DEGREES = 20
 
 
 def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, prime_hub, drive_base):
-    # Gyro on for this mission (reset to off before every mission).
     drive_base.use_gyro(True)
     # Start the arm at the bottom. Lift it, then drive.
     move_arm_degrees(left_top_motor, right_top_motor, M7_ARM_RAISE_DEGREES + ARM_SLOP_DEGREES, ARM_SPEED_MEDIUM)

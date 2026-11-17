@@ -30,7 +30,6 @@ M5_AFTER_LAUNCH_BACK_UP_MM = 150
 
 
 def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, prime_hub, drive_base):
-    # Gyro on for this mission (reset to off before every mission).
     drive_base.use_gyro(True)
     # Drive to the spot (arm starts at the bottom).
     drive_base.straight(M5_APPROACH_MM)

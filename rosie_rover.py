@@ -48,6 +48,9 @@ ARM_SPEED_FAST = 600
 ARM_ACCELERATION_DEFAULT = 2000  # Pybricks default
 ARM_ACCELERATION_MAX = 20000
 
+# Reflection (0-100%) that counts as white. White ~90+, black ~10. Not measured yet.
+WHITE_LINE_MIN_REFLECTION = 80
+
 # Pause between moves while testing, ms. Set to 0 to turn the pauses off.
 # Shared by every mission that uses wait(TEST_DELAY).
 # TEST_DELAY = 3000
@@ -103,6 +106,27 @@ def straight_until_done_or_stalled(drive_base, distance):
             drive_base.stop()
             break
         wait(10)
+
+
+def drive_until_white_line(drive_base, left_color_sensor, right_color_sensor, distance, speed):
+    # Like drive_base.straight(distance), but stops when either sensor sees white.
+    # Returns drive_base.distance() where white was seen, or None.
+    drive_base.settings(straight_speed=speed)
+    drive_base.straight(distance, wait=False)
+    while not drive_base.done():
+        left = left_color_sensor.reflection()
+        right = right_color_sensor.reflection()
+        if left >= WHITE_LINE_MIN_REFLECTION or right >= WHITE_LINE_MIN_REFLECTION:
+            white_at = drive_base.distance()
+            drive_base.stop()
+            print("White line! Reflection left/right:", left, right)
+            return white_at
+        if drive_base.stalled():
+            drive_base.stop()
+            break
+        wait(10)
+    print("No white line found")
+    return None
 
 
 def arm_until_done_or_stalled(left_top_motor, right_top_motor, speed, angle):

@@ -13,7 +13,6 @@ from remote_protocol import (
     ROBOT_BROADCAST_CHANNEL,
 )
 
-# Import mission modules here as they're written.
 import m1
 import m2
 import m3
@@ -21,15 +20,14 @@ import m4
 import m5
 import m6
 import m7
+import m8
 import m9
 import m13
 import m15
 import m16
 import m17
 
-# Map mission numbers to their run functions. Add an entry here each time
-# a new mission module is imported above. Never map mission 0 -- that
-# number is reserved for remote control mode (see the main loop below).
+# Never map mission 0 -- it's remote control.
 MISSIONS = {
     1: m1.run,
     2: m2.run,
@@ -38,6 +36,7 @@ MISSIONS = {
     5: m5.run,
     6: m6.run,
     7: m7.run,
+    8: m8.run,
     9: m9.run,
     13: m13.run,
     15: m15.run,
@@ -45,19 +44,14 @@ MISSIONS = {
     17: m17.run,
 }
 
-# The order we run missions in at competition. The selector starts on the
-# first one, and after a mission finishes it jumps to the next one in this
-# list (wrapping back to the start after the last). If the mission that just
-# ran isn't in this list, the number stays where it is.
+# Competition run order. After a mission finishes, the selector jumps to the next one.
 MISSION_ORDER = [6, 13, 7, 17, 2, 1, 3, 15, 4, 9, 5]
 
-# Highest number the selector goes up to before wrapping back to 0.
 MAX_MISSION = 17
 
 MAX_TURN_RATE_DEGSEC = 200
 
-# Opposite checkerboard patterns, flashed when CENTER is pressed on a number
-# with no mission mapped to it.
+# Flashed when CENTER is pressed on a number with no mission.
 CHECKER_A = Matrix(
     [
         [100, 0, 100, 0, 100],
@@ -77,7 +71,7 @@ CHECKER_B = Matrix(
     ]
 )
 
-# Right-pointing "play" triangle, shown on the display while a mission runs.
+# Shown while a mission runs.
 PLAY_ICON = Matrix(
     [
         [0, 100, 0, 0, 0],
@@ -88,9 +82,7 @@ PLAY_ICON = Matrix(
     ]
 )
 
-# Missions that show an icon instead of their number on the display.
-# m17 (drive to the other launch area) shows an arrow pointing toward the
-# front of the robot. It's still mission 17 everywhere else.
+# Missions that show an icon instead of their number.
 MISSION_ICONS = {
     17: Icon.ARROW_UP,
 }
@@ -120,15 +112,11 @@ radio = BLERadio(ROBOT_BROADCAST_CHANNEL, [REMOTE_BROADCAST_CHANNEL])
 prime_hub.speaker.volume(10 if USE_LOW_VOLUME_BEEP else 100)
 rosie_rover.print_battery(prime_hub)
 
-# By default, pressing CENTER stops the program. We want CENTER to launch
-# missions instead, so require CENTER+BLUETOOTH together to stop the program.
+# CENTER launches missions, so CENTER+BLUETOOTH stops the program.
 prime_hub.system.set_stop_button((Button.CENTER, Button.BLUETOOTH))
 
-# Show "C" (calibrating) to remind us to keep the robot still while the gyro
-# calibrates. Pybricks recalibrates whenever the hub sits still for a few
-# seconds; imu.ready() turns True once it has. Show it for at least 1.5 s,
-# longer if the gyro isn't ready yet -- but give up after 5 s so a robot
-# that's being held or bumped can't get stuck on "C" forever.
+# Show "C" while the gyro calibrates (keep the robot still).
+# At least 1.5 s, up to 5 s if the gyro isn't ready.
 prime_hub.display.char("C")
 calibration_watch = StopWatch()
 while calibration_watch.time() < 1500 or not prime_hub.imu.ready():
@@ -157,21 +145,15 @@ def clamp(value, low, high):
     return max(low, min(high, value))
 
 
-# True while the wheels are actively held in place by hold_wheels().
 wheels_held = False
 
-# Last remote message we acted on. The radio hands us the same message over
-# and over until the remote changes it, so we only send motor commands when
-# it's actually different -- no repeated drive/stop/hold calls.
+# Last remote message acted on, so repeats are ignored.
 last_message = None
 
 
 def hold_wheels():
-    # drive_base.stop() only coasts, so the wheels can still roll a bit
-    # (momentum, or arm motion pushing the robot). hold() actively locks
-    # them at their current position. Only call it once per hold: every
-    # hold() re-targets to wherever the wheels are *now*, so calling it
-    # every loop would let them creep.
+    # Locks the wheels (stop() only coasts). Only once per hold:
+    # each hold() re-targets to the current spot, so repeating it lets them creep.
     global wheels_held
     if not wheels_held:
         drive_base.hold()
@@ -199,9 +181,7 @@ def handle_remote():
     last_message = received
 
     mode, speed_pct, pitch, roll = received
-    # Measured on real hardware: tipping forward gives negative pitch, and
-    # tipping left gives positive roll -- both opposite of what drive_base
-    # wants (positive speed = forward, positive turn_rate = clockwise/right).
+    # Pitch and roll are both backwards from what drive_base wants (measured on hardware).
     tilt_forward = clamp(-pitch / MAX_TILT_DEG, -1, 1)
     tilt_side = clamp(-roll / MAX_TILT_DEG, -1, 1)
     power_limit = speed_pct / 100
@@ -230,11 +210,7 @@ show_mission(mission_number)
 
 try:
     while True:
-        # Mission 0 is reserved for remote control -- no CENTER press
-        # needed, it's just active the whole time the display reads 0, and
-        # completely ignored otherwise. This is so the remote's small
-        # resting movements never nudge the robot while it's being placed
-        # for a mission.
+        # Remote control is active only while the display reads 0.
         if mission_number == 0:
             handle_remote()
 
@@ -266,10 +242,7 @@ try:
                 prime_hub.speaker.beep()
                 prime_hub.display.icon(PLAY_ICON)
                 watch = StopWatch()
-                # While a mission runs, CENTER alone is the stop button.
-                # Pressing it raises SystemExit inside the mission; we catch
-                # it here so it only aborts the mission and goes back to the
-                # menu instead of ending the whole program.
+                # During a mission, CENTER aborts it and returns to the menu.
                 prime_hub.system.set_stop_button(Button.CENTER)
                 aborted = False
                 try:
@@ -285,26 +258,19 @@ try:
                     aborted = True
                 finally:
                     prime_hub.system.set_stop_button((Button.CENTER, Button.BLUETOOTH))
-                # The last move ends with Stop.HOLD, so the drive base keeps
-                # holding its position (and heading, if the gyro is on). Let
-                # go so the robot can be picked up and moved freely. After an
-                # abort, this also stops whatever was still moving (the
-                # program didn't end, so the firmware won't do it for us).
+                # Release the final Stop.HOLD, and stop anything still moving after an abort.
                 stop_remote_motion()
-                # Some missions turn the gyro on. Turn it back off so remote
-                # control (mission 0) always drives with the gyro off.
+                # Remote control always drives gyro-off.
                 drive_base.use_gyro(False)
                 elapsed_sec = watch.time() / 1000
                 prime_hub.speaker.beep()
                 if aborted:
                     print(f"Aborted Mission {mission_number:02}, time {elapsed_sec:.1f} seconds")
-                    # CENTER is probably still held down -- wait so it
-                    # doesn't immediately launch the mission again.
+                    # Don't relaunch from the CENTER press that aborted.
                     wait_for_release()
                 else:
                     print(f"Finished Mission {mission_number:02}, time {elapsed_sec:.1f} seconds")
-                    # Move on to the next mission in the run order. An
-                    # aborted mission stays selected so it can be retried.
+                    # Next mission in the run order (aborted ones stay selected).
                     if mission_number in MISSION_ORDER:
                         next_index = MISSION_ORDER.index(mission_number) + 1
                         mission_number = MISSION_ORDER[next_index % len(MISSION_ORDER)]
@@ -321,8 +287,6 @@ try:
 
         wait(10)
 finally:
-    # The stop button raises inside the loop rather than letting the
-    # program finish normally, so nothing guarantees motors get stopped
-    # unless we do it here ourselves.
+    # The stop button doesn't stop motors for us, so do it here.
     stop_remote_motion()
     print("Goodbye")

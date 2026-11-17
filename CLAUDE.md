@@ -60,6 +60,14 @@ and `requirements.txt`, with the rest intentionally left behind (see
   lift from the bottom stop (gear backlash, measured on hardware). The
   arm starts each mission resting on its bottom stop. m5 and m7's opening lift use
   it; the `dc()` throws in m7/m9/m13 are deliberately left as-is.
+  `drive_until_white_line(drive_base, left_color_sensor, right_color_sensor,
+  distance, speed)` (added 2026-11-17, untested on hub) drives like
+  `straight(distance)` but stops when either sensor's `reflection()` reaches
+  `WHITE_LINE_MIN_REFLECTION` (80, a guess). It returns `drive_base.distance()` at
+  the moment white was seen (or `None`), so the caller can subtract the coast.
+  `m8.py` is a test copy of m6 that uses it to back up from the ant push to the
+  white mat line. Distance alone fails there: with the bumper, a blocked push
+  slips the wheels, so it reads like a full push.
   `reset_arm_settings()` puts arm acceleration back to the default before every
   mission. m5 (2026-11-17): lift the upper root arm while backing up 30 mm, back off, then lift the lower root arm the same way and launch (one attempt). A temporary `m8.py` arm-test mission was used for tuning, then deleted.
   m2's arm was too weak at `arm_until_done_or_stalled(..., 200, 180)`;

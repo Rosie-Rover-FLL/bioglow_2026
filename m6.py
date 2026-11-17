@@ -1,18 +1,12 @@
 from rosie_rover import TEST_DELAY, straight_until_done_or_stalled
 from pybricks.tools import wait
 
-# How far to drive for the ant push (mm). Stops early if it stalls.
-# Err long: a short ant is worse than a stall.
+# How far to drive for the ant push (mm). Stops early if it stalls, so really this number is about 190 but boosted to 220
 PUSH_DRIVE_MM = 220
-
-# Where to turn toward the window: this far (mm) past where the push started.
-# Tuned 2026-11-17 (push 195, back up 110 = 85). Doesn't depend on PUSH_DRIVE_MM.
-WINDOW_TURN_SPOT_MM = 85
 
 
 def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, prime_hub, drive_base):
     drive_base.use_gyro(True)
-    # Sets the rover speed fast initially
     drive_base.settings(straight_speed=500)
     drive_base.straight(550)
     drive_base.arc(23, angle=65)
@@ -26,10 +20,9 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     pushed = drive_base.distance() - push_start
     print("Ant push mm:", pushed)
 
-    # Back away and window prep.
-    # Back up to the same spot every time, no matter how far the push got.
+    # Back up to 85 mm past the push start, no matter how far the push got
     drive_base.settings(straight_speed=350)
-    back_up = pushed - WINDOW_TURN_SPOT_MM
+    back_up = pushed - 85
     if back_up > 0:
         drive_base.straight(-back_up)
     drive_base.turn(96)

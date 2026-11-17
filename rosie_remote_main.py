@@ -23,18 +23,13 @@ ROSIE_REMOTE_BANNER = r"""
 
 print(ROSIE_REMOTE_BANNER)
 
-# Held flat, buttons facing up, CENTER button toward the driver's right
-# thumb, BLUETOOTH button toward the front-left corner. Confirmed correct
-# on real hardware (2026-08-31): tilting forward/backward barely moves
-# roll, and tilting left/right barely moves pitch.
+# Held flat, buttons up, CENTER at the right thumb (confirmed on hardware).
 hub = PrimeHub(top_side=Axis.Z, front_side=-Axis.Y)
 radio = BLERadio(REMOTE_BROADCAST_CHANNEL, [])
 
-# Same stop combo as the robot -- CENTER is reserved for something else
-# (coming soon), so it can't be the lone stop button here either.
+# Same stop combo as the robot (CENTER is saved for a future feature).
 hub.system.set_stop_button((Button.CENTER, Button.BLUETOOTH))
 
-# Same quiet/full volume switch as the robot.
 USE_LOW_VOLUME_BEEP = True
 hub.speaker.volume(10 if USE_LOW_VOLUME_BEEP else 100)
 
@@ -43,33 +38,24 @@ LOCK_BEEP_HZ = 400
 UNLOCK_BEEP_HZ = 800
 BEEP_MS = 100
 
-# Speed knob: a large motor turned by hand, never driven. Large motors have
-# a physical dot marking their true absolute zero, which persists across
-# power cycles -- so we deliberately do NOT call reset_angle(0) here. The
-# dot position (angle 0) is 50% speed; confirmed on real hardware
-# (2026-08-31) that +/-90 degrees from the dot reaches 100%/0%.
+# Speed knob: a large motor turned by hand. Its dot is 50%, +/-90 degrees is 100%/0%.
+# No reset_angle(0): the motor's absolute zero (the dot) survives power cycles.
 SPEED_KNOB_PORT = Port.B
 KNOB_MAX_ANGLE = 90
 
 speed_knob = Motor(SPEED_KNOB_PORT)
 
-# Non-blocking "print what we're sending" -- checked every loop but only
-# actually prints once the timer clears 1 second, so it doesn't slow down
-# the ~100ms broadcast/display cadence.
+# Print what we're sending once a second.
 PRINT_INTERVAL_MS = 1000
 print_timer = StopWatch()
 
-# Speed knob readout: when the knob moves more than SPEED_CHANGE_THRESHOLD
-# away from the last value we showed, show the new value as a number for
-# SPEED_DISPLAY_MS, then go back to the normal dot/bar/lock display.
+# When the knob moves, show the new speed as a number for a moment.
 SPEED_CHANGE_THRESHOLD = 2
 SPEED_DISPLAY_MS = 1500
 speed_display_timer = StopWatch()
 showing_speed = True  # show the speed once at startup
 
-# Wheel lock: LEFT toggles it. While locked the wheels never get a drive
-# command (we send MODE_LOCKED, which stops everything), but holding RIGHT
-# still runs the arm like normal. Starts unlocked.
+# LEFT toggles wheel lock. Holding RIGHT still runs the arm while locked.
 wheels_locked = False
 left_was_pressed = False
 
@@ -87,10 +73,7 @@ def clamp(value, low, high):
 
 
 def ball_matrix(pitch, roll):
-    # "Ball on a plane": pitch moves the lit pixel along columns (forward
-    # = col 4, backward = col 0), roll moves it along rows (left = row 0,
-    # right = row 4), center = (2, 2). Same sign convention as the robot's
-    # tilt_forward/tilt_side, confirmed on real hardware 2026-08-31.
+    # "Ball on a plane": one lit pixel shows the tilt. Same signs as the robot.
     tilt_forward = clamp(-pitch / MAX_TILT_DEG, -1, 1)
     tilt_side = clamp(-roll / MAX_TILT_DEG, -1, 1)
     col = int(round(2 + tilt_forward * 2))
@@ -101,9 +84,7 @@ def ball_matrix(pitch, roll):
 
 
 def bar_matrix(pitch):
-    # Attachment mode only cares about pitch (both arm motors always move
-    # together), so the display is a full vertical bar instead of a single
-    # dot -- same column math as ball_matrix, every row lit.
+    # Attachment mode only uses pitch, so show a full bar instead of a dot.
     tilt_forward = clamp(-pitch / MAX_TILT_DEG, -1, 1)
     col = int(round(2 + tilt_forward * 2))
     grid = [[0] * 5 for _ in range(5)]
@@ -120,9 +101,7 @@ def knob_speed_pct():
 prior_speed_pct = knob_speed_pct()
 speed_display_timer.reset()
 
-# Last message handed to the radio. We only call broadcast() when the
-# message actually changes -- the radio keeps advertising the last message
-# on its own, so re-sending the same thing is pointless.
+# Only broadcast when the message changes (the radio repeats the last one).
 last_message = None
 
 while True:
@@ -154,9 +133,7 @@ while True:
     if showing_speed and speed_display_timer.time() >= SPEED_DISPLAY_MS:
         showing_speed = False
 
-    # Hold RIGHT for attachment-control mode (works even when wheels are
-    # locked); both arm motors always move together in that mode, so there's
-    # no need for a force sensor or any per-motor lock.
+    # Hold RIGHT for arm control (works even when wheels are locked).
     if Button.RIGHT in pressed:
         mode = MODE_ATTACHMENT
         normal_icon = bar_matrix(pitch)
@@ -185,9 +162,7 @@ while True:
             print(f"Speed percentage: {speed_pct}%  Wheel motor speed: {wheel_speed:.0f} mm/s")
         print_timer.reset()
 
-    # Only send what the robot actually uses in each mode, so values it
-    # ignores (e.g. tilt while locked) don't count as a "change". Locked is
-    # always the exact same message, so it's sent once and then left alone.
+    # Zero out values the robot ignores in each mode, so they don't count as a change.
     if mode == MODE_LOCKED:
         message = (MODE_LOCKED, 0, 0, 0)
     elif mode == MODE_ATTACHMENT:
