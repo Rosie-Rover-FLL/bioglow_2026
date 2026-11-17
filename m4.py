@@ -13,7 +13,7 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     # (20000 deg/s², default is 2000).
     left_top_motor.control.limits(acceleration=20000)
     right_top_motor.control.limits(acceleration=20000)
-    arm_until_done_or_stalled(left_top_motor, right_top_motor, 1000, 210)
+    arm_until_done_or_stalled(left_top_motor, right_top_motor, 1000, 200)
     # Back to the default so other missions aren't affected.
     left_top_motor.control.limits(acceleration=2000)
     right_top_motor.control.limits(acceleration=2000)

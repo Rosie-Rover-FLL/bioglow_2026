@@ -45,6 +45,12 @@ MISSIONS = {
     17: m17.run,
 }
 
+# The order we run missions in at competition. The selector starts on the
+# first one, and after a mission finishes it jumps to the next one in this
+# list (wrapping back to the start after the last). If the mission that just
+# ran isn't in this list, the number stays where it is.
+MISSION_ORDER = [6, 13, 7, 17, 2, 1, 3, 15, 4, 9, 5]
+
 # Highest number the selector goes up to before wrapping back to 0.
 MAX_MISSION = 17
 
@@ -131,7 +137,7 @@ while calibration_watch.time() < 1500 or not prime_hub.imu.ready():
         break
     wait(10)
 
-mission_number = 1
+mission_number = MISSION_ORDER[0]
 
 
 def show_mission(number):
@@ -254,6 +260,7 @@ try:
             run_mission = MISSIONS.get(mission_number)
             if run_mission:
                 rosie_rover.reset_drive_settings(drive_base)
+                rosie_rover.reset_arm_settings(left_top_motor, right_top_motor)
                 rosie_rover.print_battery(prime_hub)
                 print(f"Starting Mission {mission_number:02}")
                 prime_hub.speaker.beep()
@@ -296,6 +303,11 @@ try:
                     wait_for_release()
                 else:
                     print(f"Finished Mission {mission_number:02}, time {elapsed_sec:.1f} seconds")
+                    # Move on to the next mission in the run order. An
+                    # aborted mission stays selected so it can be retried.
+                    if mission_number in MISSION_ORDER:
+                        next_index = MISSION_ORDER.index(mission_number) + 1
+                        mission_number = MISSION_ORDER[next_index % len(MISSION_ORDER)]
             else:
                 prime_hub.display.icon(CHECKER_A)
                 wait(500)

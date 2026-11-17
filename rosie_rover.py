@@ -28,6 +28,26 @@ TURN_RATE_DECELERATION_DEG_PER_S2 = 1159  # Pybricks default
 # True = steer with the gyro. Re-test turns if you change this!
 USE_GYRO = False
 
+# Arm gearing: 12-tooth gear on the motor drives a 20-tooth gear on the arm,
+# so 1 motor degree = 12/20 arm degree. move_arm_degrees() does this math for you.
+ARM_GEAR_RATIO = 20 / 12  # motor degrees per arm degree
+
+# Extra arm degrees for the FIRST lift from the bottom stop. The gears are loose
+# at first, so the motor turns a bit before the arm starts to move.
+# Measured with m8 (2026-11-17, 1 test): a 10° lift only moved the arm ~4°.
+ARM_SLOP_DEGREES = 6
+
+# Arm speed, ARM deg/s (max 600 = motor max 1000 x 12/20)
+ARM_SPEED_SLOW = 90
+ARM_SPEED_MEDIUM = 240
+ARM_SPEED_FAST = 600
+
+# Arm motor start/stop acceleration, MOTOR deg/s² (max 20000).
+# reset_arm_settings() sets the default before every mission. To change it, call
+# left_top_motor.control.limits(acceleration=...) (same for right) before move_arm_degrees().
+ARM_ACCELERATION_DEFAULT = 2000  # Pybricks default
+ARM_ACCELERATION_MAX = 20000
+
 # Pause between moves while testing, ms. Set to 0 to turn the pauses off.
 # Shared by every mission that uses wait(TEST_DELAY).
 # TEST_DELAY = 3000
@@ -65,6 +85,12 @@ def reset_drive_settings(drive_base):
     drive_base.use_gyro(USE_GYRO)
 
 
+def reset_arm_settings(left_top_motor, right_top_motor):
+    # Runs before every mission, so one mission's arm acceleration doesn't carry over.
+    left_top_motor.control.limits(acceleration=ARM_ACCELERATION_DEFAULT)
+    right_top_motor.control.limits(acceleration=ARM_ACCELERATION_DEFAULT)
+
+
 def print_battery(prime_hub):
     print(f"Battery voltage: {prime_hub.battery.voltage()} mV")
 
@@ -89,4 +115,18 @@ def arm_until_done_or_stalled(left_top_motor, right_top_motor, speed, angle):
             right_top_motor.stop()
             break
         wait(10)
+
+
+def move_arm_degrees(left_top_motor, right_top_motor, arm_degrees, arm_speed, blocking=True):
+    # Moves the arm by arm_degrees (+ = up, - = down) at arm_speed (arm deg/s).
+    # Both measured at the arm, not the motor.
+    # blocking=True waits until done (and stops if stuck).
+    # blocking=False starts the move and goes right on to the next line (e.g. to drive at the same time).
+    motor_speed = arm_speed * ARM_GEAR_RATIO
+    motor_degrees = arm_degrees * ARM_GEAR_RATIO
+    if blocking:
+        arm_until_done_or_stalled(left_top_motor, right_top_motor, motor_speed, motor_degrees)
+    else:
+        left_top_motor.run_angle(motor_speed, motor_degrees, wait=False)
+        right_top_motor.run_angle(motor_speed, motor_degrees, wait=False)
 

@@ -49,6 +49,19 @@ and `requirements.txt`, with the rest intentionally left behind (see
   `arm_until_done_or_stalled(left_top_motor, right_top_motor, speed,
   angle)` are the other functions — the two `_until_done_or_stalled`
   helpers are deliberately named as a parallel pair.
+  `move_arm_degrees(left_top_motor, right_top_motor, arm_degrees, arm_speed,
+  blocking=True)` (added 2026-11-17) takes degrees and speed **at the arm**
+  (12-tooth motor gear → 20-tooth arm gear, `ARM_GEAR_RATIO = 20/12`).
+  `blocking=False` lets the arm move while driving (m5 lifts the root while
+  backing up 30 mm, since lifting in place jams). No acceleration param on
+  purpose: a mission that needs a
+  different acceleration sets `control.limits(acceleration=...)` on both motors
+  before calling it, m2-style. `ARM_SLOP_DEGREES` is added to the first
+  lift from the bottom stop (gear backlash, measured on hardware). The
+  arm starts each mission resting on its bottom stop. m5 and m7's opening lift use
+  it; the `dc()` throws in m7/m9/m13 are deliberately left as-is.
+  `reset_arm_settings()` puts arm acceleration back to the default before every
+  mission. m5 (2026-11-17): lift the upper root arm while backing up 30 mm, back off, then lift the lower root arm the same way and launch (one attempt). A temporary `m8.py` arm-test mission was used for tuning, then deleted.
   m2's arm was too weak at `arm_until_done_or_stalled(..., 200, 180)`;
   fixed 2026-11-03 by raising the speed to 950 deg/s (arm motors max out
   at 1000 deg/s). A separate full-power `dc()` helper was tried and dropped
@@ -234,7 +247,12 @@ just tilt reading (the robot doesn't read its own tilt).
 - Reassigns the stop button to `(Button.CENTER, Button.BLUETOOTH)` via
   `prime_hub.system.set_stop_button(...)` so CENTER is free to use as "run"
   instead of "stop".
-- Shows a two-digit number on the hub display, starting at `1`. Missions
+- Shows a two-digit number on the hub display, starting at
+  `MISSION_ORDER[0]` (added 2026-11-16; `MISSION_ORDER = [6, 13, 7, 17, 2,
+  1, 3, 15, 4, 9, 5]` is the competition run order). After a mission
+  *finishes* (not aborted), the selector jumps to the next mission in
+  `MISSION_ORDER`, wrapping to the start; a mission not in the list leaves
+  the number unchanged, and an aborted mission stays selected for a retry. Missions
   in the `MISSION_ICONS` dict show an icon instead (currently only
   `17: Icon.ARROW_UP`, added 2026-11-11); all display updates go through
   `show_mission()`.
