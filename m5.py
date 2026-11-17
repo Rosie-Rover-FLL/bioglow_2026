@@ -53,7 +53,7 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
         -(M5_ARM_LIFT_DEGREES + ARM_SLOP_DEGREES - M5_ARM_LOWER_DEGREES),
         ARM_SPEED_MEDIUM,
     )
-    drive_base.straight(M5_BACK_UP_MM + 20)
+    drive_base.straight(M5_BACK_UP_MM + 12)
 
     # Stage 2: lift the lower root arm while backing up a little.
     move_arm_degrees(
@@ -82,7 +82,7 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
         M5_APPROACH_MM
         - M5_LIFT_BACK_UP_MM
         - M5_BACK_UP_MM
-        + (M5_BACK_UP_MM + 20)
+        + (M5_BACK_UP_MM + 12)
         - M5_LIFT_BACK_UP_MM
         - M5_AFTER_LAUNCH_BACK_UP_MM
     )
