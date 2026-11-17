@@ -2,7 +2,7 @@ from pybricks.hubs import PrimeHub
 from pybricks.parameters import Axis, Direction, Port
 from pybricks.pupdevices import ColorSensor, Motor
 from pybricks.robotics import DriveBase
-from pybricks.tools import wait
+from pybricks.tools import StopWatch, wait
 
 # Drive speed, mm/s (max 742). Times = m16 at this speed.
 DRIVE_SPEED_DEFAULT_MM_PER_S = 450  # Medium, m16 ~4.8 s (est.)
@@ -50,6 +50,9 @@ ARM_ACCELERATION_MAX = 20000
 
 # Reflection (0-100%) that counts as white. White ~90+, black ~10. Not measured yet.
 WHITE_LINE_MIN_REFLECTION = 80
+
+# True = print color sensor readings every 50 ms while looking for the white line.
+PRINT_DEBUG_LINE_SENSOR_READINGS = True
 
 # Pause between moves while testing, ms. Set to 0 to turn the pauses off.
 # Shared by every mission that uses wait(TEST_DELAY).
@@ -110,23 +113,27 @@ def straight_until_done_or_stalled(drive_base, distance):
 
 def drive_until_white_line(drive_base, left_color_sensor, right_color_sensor, distance, speed):
     # Like drive_base.straight(distance), but stops when either sensor sees white.
-    # Returns drive_base.distance() where white was seen, or None.
+    # Returns True if it found white, False if not.
     drive_base.settings(straight_speed=speed)
+    start = drive_base.distance()
     drive_base.straight(distance, wait=False)
+    print_timer = StopWatch()
     while not drive_base.done():
         left = left_color_sensor.reflection()
         right = right_color_sensor.reflection()
+        if PRINT_DEBUG_LINE_SENSOR_READINGS and print_timer.time() >= 50:
+            print_timer.reset()
+            print("Reflection left/right:", left, right, "at mm:", abs(drive_base.distance() - start))
         if left >= WHITE_LINE_MIN_REFLECTION or right >= WHITE_LINE_MIN_REFLECTION:
-            white_at = drive_base.distance()
-            drive_base.stop()
-            print("White line! Reflection left/right:", left, right)
-            return white_at
+            drive_base.brake()
+            print(f"White line! Reflection left/right: {left} {right} at mm: {abs(drive_base.distance() - start)} (before the max of {abs(distance)})")
+            return True
         if drive_base.stalled():
             drive_base.stop()
             break
         wait(10)
     print("No white line found")
-    return None
+    return False
 
 
 def arm_until_done_or_stalled(left_top_motor, right_top_motor, speed, angle):

@@ -63,8 +63,8 @@ and `requirements.txt`, with the rest intentionally left behind (see
   `drive_until_white_line(drive_base, left_color_sensor, right_color_sensor,
   distance, speed)` (added 2026-11-17, untested on hub) drives like
   `straight(distance)` but stops when either sensor's `reflection()` reaches
-  `WHITE_LINE_MIN_REFLECTION` (80, a guess). It returns `drive_base.distance()` at
-  the moment white was seen (or `None`), so the caller can subtract the coast.
+  `WHITE_LINE_MIN_REFLECTION` (80, a guess), using `brake()` so it barely coasts.
+  It returns `True`/`False` (found white or not).
   `m8.py` is a test copy of m6 that uses it to back up from the ant push to the
   white mat line. Distance alone fails there: with the bumper, a blocked push
   slips the wheels, so it reads like a full push.

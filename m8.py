@@ -22,16 +22,13 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     pushed = drive_base.distance() - push_start
     print("Ant push mm:", pushed)
 
-    # Back up slowly to the white line. If it's not found, ends where m6 would.
+    # Back up to the white line, then a set amount more.
+    # Max back-up: 110 after a full push (195), less after a short one.
     back_up = pushed - 85
-    if back_up > 0:
-        white_at = drive_until_white_line(drive_base, left_color_sensor, right_color_sensor, -back_up, 150)
-        if white_at is not None:
-            # Then a set amount past the line, minus how far it coasted.
-            already_past = white_at - drive_base.distance()
-            print("Coasted past the white line mm:", already_past)
+    if back_up > 0:  # under 85 mm means the push failed; a negative back-up would drive forward into the ant
+        if drive_until_white_line(drive_base, left_color_sensor, right_color_sensor, -back_up, 150):
             drive_base.settings(straight_speed=350)
-            drive_base.straight(-(ADDITIONAL_REVERSE_AFTER_WHITE_LINE_MM - already_past))
+            drive_base.straight(-ADDITIONAL_REVERSE_AFTER_WHITE_LINE_MM)
     drive_base.settings(straight_speed=350)
     drive_base.turn(96)
 
