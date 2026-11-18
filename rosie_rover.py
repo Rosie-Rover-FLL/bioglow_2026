@@ -4,6 +4,9 @@ from pybricks.pupdevices import ColorSensor, Motor
 from pybricks.robotics import DriveBase
 from pybricks.tools import StopWatch, wait
 
+WHEEL_DIAMETER_MM = 85
+AXLE_TRACK_MM = 110
+
 # Drive speed, mm/s (max 742). Times = m16 at this speed.
 DRIVE_SPEED_DEFAULT_MM_PER_S = 450  # Medium, m16 ~4.8 s (est.)
 # DRIVE_SPEED_DEFAULT_MM_PER_S = 600  # Faster, m16 ~4.0 s (est.)
@@ -48,8 +51,10 @@ ARM_SPEED_FAST = 600
 ARM_ACCELERATION_DEFAULT = 2000  # Pybricks default
 ARM_ACCELERATION_MAX = 20000
 
-# Reflection (0-100%) that counts as white. White ~90+, black ~10. Not measured yet.
-WHITE_LINE_MIN_REFLECTION = 80
+# Color sensor reflection (0-100%). Measured 2026-11-18, low room light:
+# black 11-18, mat up to 88 (so black must come first), white 84-87.
+BLACK_LINE_BELOW_REFLECTION = 25
+WHITE_LINE_ABOVE_REFLECTION = 75
 
 # True = print color sensor readings every 50 ms while looking for the white line.
 PRINT_DEBUG_LINE_SENSOR_READINGS = True
@@ -68,7 +73,7 @@ def setup():
     left_color_sensor = ColorSensor(Port.F)
     right_color_sensor = ColorSensor(Port.A)
     prime_hub = PrimeHub(top_side=Axis.Z, front_side=-Axis.Y)
-    drive_base = DriveBase(left_wheel, right_wheel, 85, 110)
+    drive_base = DriveBase(left_wheel, right_wheel, WHEEL_DIAMETER_MM, AXLE_TRACK_MM)
     reset_drive_settings(drive_base)
     return (
         left_top_motor,
@@ -111,28 +116,41 @@ def straight_until_done_or_stalled(drive_base, distance):
         wait(10)
 
 
-def drive_until_white_line(drive_base, left_color_sensor, right_color_sensor, distance, speed):
-    # Like drive_base.straight(distance), but stops when either sensor sees white.
-    # Returns True if it found white, False if not.
+def drive_until_black_then_white_line(drive_base, left_color_sensor, right_color_sensor, distance, speed):
+    # Like drive_base.straight(distance) at speed (mm/s), but stops as soon as
+    # either sensor has seen black and then white. Returns True if it found the line.
     drive_base.settings(straight_speed=speed)
     start = drive_base.distance()
     drive_base.straight(distance, wait=False)
+    left_seen_black = False
+    right_seen_black = False
     print_timer = StopWatch()
     while not drive_base.done():
         left = left_color_sensor.reflection()
         right = right_color_sensor.reflection()
+        traveled = round(abs(drive_base.distance() - start))
         if PRINT_DEBUG_LINE_SENSOR_READINGS and print_timer.time() >= 50:
             print_timer.reset()
-            print("Reflection left/right:", left, right, "at mm:", abs(drive_base.distance() - start))
-        if left >= WHITE_LINE_MIN_REFLECTION or right >= WHITE_LINE_MIN_REFLECTION:
+            print("Reflection left/right:", left, right, "at mm:", traveled)
+
+        if not left_seen_black and left < BLACK_LINE_BELOW_REFLECTION:
+            left_seen_black = True
+            print("Left black at mm:", traveled, "reflection:", left)
+        if not right_seen_black and right < BLACK_LINE_BELOW_REFLECTION:
+            right_seen_black = True
+            print("Right black at mm:", traveled, "reflection:", right)
+
+        if (left_seen_black and left > WHITE_LINE_ABOVE_REFLECTION) or (
+            right_seen_black and right > WHITE_LINE_ABOVE_REFLECTION
+        ):
             drive_base.brake()
-            print(f"White line! Reflection left/right: {left} {right} at mm: {abs(drive_base.distance() - start)} (before the max of {abs(distance)})")
+            print(f"White line! Reflection left/right: {left} {right} at mm: {traveled} (before the max of {abs(distance)})")
             return True
         if drive_base.stalled():
             drive_base.stop()
             break
         wait(10)
-    print("No white line found")
+    print(f"No white line found (max was {abs(distance)})")
     return False
 
 

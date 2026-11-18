@@ -60,14 +60,19 @@ and `requirements.txt`, with the rest intentionally left behind (see
   lift from the bottom stop (gear backlash, measured on hardware). The
   arm starts each mission resting on its bottom stop. m5 and m7's opening lift use
   it; the `dc()` throws in m7/m9/m13 are deliberately left as-is.
-  `drive_until_white_line(drive_base, left_color_sensor, right_color_sensor,
-  distance, speed)` (added 2026-11-17, untested on hub) drives like
-  `straight(distance)` but stops when either sensor's `reflection()` reaches
-  `WHITE_LINE_MIN_REFLECTION` (80, a guess), using `brake()` so it barely coasts.
-  It returns `True`/`False` (found white or not).
-  `m8.py` is a test copy of m6 that uses it to back up from the ant push to the
-  white mat line. Distance alone fails there: with the bumper, a blocked push
-  slips the wheels, so it reads like a full push.
+  `drive_until_black_then_white_line(drive_base, left_color_sensor,
+  right_color_sensor, distance, speed)` (2026-11-18) drives like
+  `straight(distance)`. It stops as soon as either sensor has read black
+  (`reflection()` < `BLACK_LINE_BELOW_REFLECTION`, 25) and then white
+  (> `WHITE_LINE_ABOVE_REFLECTION`, 75). Black comes first because the mat read up
+  to 88. Returns True if it found the line. It does **line finding only, no
+  straightening**. Squaring to the line (atan2 turn, then a wheel-per-sensor
+  `drive()`) was tried on the hub 2026-11-18 and made things much worse. Don't
+  suggest it again.
+  `m6.py` uses it to back up from the ant push. Distance alone failed there: with
+  the bumper, a blocked push slips the wheels, so it reads like a full push.
+  Tuned 2026-11-18 with a temporary `m8.py` line-only test (since deleted): back up
+  at 75 mm/s to the line, back up 15 mm more, then `turn(95)`.
   `reset_arm_settings()` puts arm acceleration back to the default before every
   mission. m5 (2026-11-17): lift the upper root arm while backing up 30 mm, back off, then lift the lower root arm the same way and launch (one attempt). A temporary `m8.py` arm-test mission was used for tuning, then deleted.
   m2's arm was too weak at `arm_until_done_or_stalled(..., 200, 180)`;
@@ -113,6 +118,17 @@ and `requirements.txt`, with the rest intentionally left behind (see
   from Team 24277), `initial_testing/` (early scratch experiments), and
   `rosie_adjust.py` (unfinished, never-working position-nudge menu).
   Recover from git history if ever needed.
+
+## Code style rules
+
+- **No global variables.** No `global` statements and no module-level
+  variables that change at runtime (constants are fine). David rejected saving the
+  drive wheels as `rosie_rover.py` module globals (2026-11-18). If a helper needs
+  something, pass it in. If missions need new hardware objects, add them to
+  `setup()`'s return tuple and every `run(...)` signature. Changing every signature
+  is fine with David; hidden shared state is not.
+  (`rosie_rover_main.py`'s existing top-level program state, like
+  `mission_number`, `wheels_held` and `last_message`, predates this rule.)
 
 ## Patterns learned from Team 24277 (to reuse/adapt, not copy verbatim)
 
