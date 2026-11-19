@@ -23,9 +23,7 @@ M5_SCOOP_2_ARM_HEAD_START_MS = 250
 M5_ARM_LOWEST_DEGREES = 2
 
 # Stage 1 (once): lift the upper root arm.
-M5_ARM_LIFT_DEGREES = 48  # was 38 with the bottom stop
-# Then lower the arm this much before backing away.
-M5_ARM_LOWER_DEGREES = 20
+M5_ARM_LIFT_DEGREES = 58  # was 38 with the bottom stop
 # Back up this much, lower the arm, come forward the same amount.
 M5_BACK_UP_MM = 80
 
@@ -33,7 +31,7 @@ M5_BACK_UP_MM = 80
 M5_ARM_PREP_DEGREES = 30  # was 25 with the bottom stop
 # Full-power throw, on top of the prep height. The arm is slammed to a stop here
 # (it coasts a little past; see the printed overshoot) so it doesn't block the ball.
-M5_ARM_LAUNCH_DEGREES = 45
+M5_ARM_LAUNCH_DEGREES = 40
 # Safety cap so the throw can never hang if the arm gets stuck.
 M5_LAUNCH_TIMEOUT_MS = 500
 # Drive backward this much DURING the throw, with a very fast start, to help the
@@ -78,14 +76,8 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     right_top_motor.brake()
     wait(50)
     wait(M5_VIDEO_LIFT_DELAY)  # Video pause after the lift.
-    # Lower part way, back up, arm (almost) to the bottom, come forward again.
-    move_arm_to_height(
-        left_top_motor,
-        right_top_motor,
-        start_angle,
-        M5_ARM_LIFT_DEGREES + ARM_SLOP_DEGREES - M5_ARM_LOWER_DEGREES,
-        ARM_SPEED_SLOW,
-    )
+    # Back up with the arm still up (pulls the root out more), then arm (almost) to the
+    # bottom, come forward again.
     drive_base.straight(-M5_BACK_UP_MM)
     move_arm_to_height(left_top_motor, right_top_motor, start_angle, M5_ARM_LOWEST_DEGREES, ARM_SPEED_MEDIUM)
     drive_base.straight(M5_BACK_UP_MM + 12)
