@@ -1,3 +1,6 @@
+# m5: drive out, scoop 1, back up, backward S move to the right, straight back in,
+# 90 degree launch (two tries, the second a little closer), drive home.
+# Start in base, arm on the ground.
 from rosie_rover import (
     ARM_GEAR_RATIO,
     ARM_SLOP_DEGREES,
@@ -5,95 +8,76 @@ from rosie_rover import (
     ARM_SPEED_SLOW,
     DRIVE_SPEED_ACCELERATION_MM_PER_S2,
     DRIVE_SPEED_DECELERATION_MM_PER_S2,
+    DRIVE_SPEED_DEFAULT_MM_PER_S,
     move_arm_degrees,
 )
 from pybricks.tools import StopWatch, wait
+from umath import cos, pi, sin
 
 # Drive from base to the root spot (arm tip just past the red handle).
 M5_APPROACH_MM = 780
-# Back up this much WHILE lifting, or the arm jams.
+
+# Scoop 1: lift the upper root arm.
 M5_LIFT_BACK_UP_MM = 30
-# Head start (ms) for the arm before the back-up begins, so the arm is really moving first.
 M5_SCOOP_1_ARM_HEAD_START_MS = 100
-M5_SCOOP_2_ARM_HEAD_START_MS = 250
-
-# All arm heights are arm degrees above where the arm started the mission.
-# No bottom stop anymore (removed 2026-11-18): the arm rests on the ground, and going
-# even 1 degree below the start knocks it off. So "down" never goes lower than this.
-M5_ARM_LOWEST_DEGREES = 2
-
-# Stage 1 (once): lift the upper root arm.
-M5_ARM_LIFT_DEGREES = 58  # was 38 with the bottom stop
-# Back up this much, lower the arm, come forward the same amount.
+M5_ARM_LOWEST_DEGREES = 2  # never lower than this above the start, or the arm falls off
+M5_ARM_LIFT_DEGREES = 58
 M5_BACK_UP_MM = 80
 
-# Stage 2: lift the lower root arm to get ready, then launch.
-M5_ARM_PREP_DEGREES = 30  # was 25 with the bottom stop
-# Full-power throw, on top of the prep height. The arm is slammed to a stop here
-# (it coasts a little past; see the printed overshoot) so it doesn't block the ball.
-M5_ARM_LAUNCH_DEGREES = 40
-# Safety cap so the throw can never hang if the arm gets stuck.
+# Backward S move after scoop 1. Two arcs in reverse that shift the robot right
+# without changing its heading. Bigger angle = sharper S (backs up less).
+M5_S_RIGHT_MM = 45  # 30 missed left, 60 missed right
+M5_S_ARC_DEGREES = 30
+# Drive the S slowly (mm/s) so it actually ends where the math says.
+M5_S_SPEED_MM_PER_S = 150
+# Come back in this much short of where scoop 1 ended (closer was too close).
+M5_COME_BACK_SHORT_MM = 50
+
+# Launch.
+M5_ARM_LAUNCH_DEGREES = 90
 M5_LAUNCH_TIMEOUT_MS = 500
-# Drive backward this much DURING the throw, with a very fast start, to help the
-# arm clear the ball at the top. Speed doesn't matter here, only the quick start.
 M5_LAUNCH_BACK_UP_MM = 30
 M5_LAUNCH_BACK_UP_ACCELERATION_MM_PER_S2 = 10000
-# After the last launch, back up this much before lowering the arm.
 M5_AFTER_LAUNCH_BACK_UP_MM = 150
-# How many times to try the lift + launch. Each retry comes back to the same spot first.
+# Two tries. Between them: back up, lower the arm, then come back in a little closer
+# than the first try (just in case it was too far).
 M5_LAUNCH_ATTEMPTS = 2
-
-# Slow-mo video pauses (ms). Set both to 0 when done filming.
-M5_VIDEO_START_DELAY = 3000
-M5_VIDEO_LIFT_DELAY = 1500
-
-
-def move_arm_to_height(left_top_motor, right_top_motor, start_angle, height, arm_speed, blocking=True):
-    # Moves the arm to `height` arm degrees above the mission's starting position, from
-    # wherever it is now. Never goes below M5_ARM_LOWEST_DEGREES, even if an earlier move
-    # came up short (e.g. a lift cut off by brake()).
-    height = max(height, M5_ARM_LOWEST_DEGREES)
-    current_height = (left_top_motor.angle() - start_angle) / ARM_GEAR_RATIO
-    move_arm_degrees(left_top_motor, right_top_motor, height - current_height, arm_speed, blocking)
+M5_RETRY_BACK_UP_MM = 50
+M5_RETRY_CLOSER_MM = 10
 
 
 def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, prime_hub, drive_base):
     drive_base.use_gyro(True)
-    wait(M5_VIDEO_START_DELAY)  # Time to start the camera.
-    # Every arm height below is measured from here.
+    # Arm heights are measured from here (arm on the ground).
     start_angle = left_top_motor.angle()
-    # Drive to the spot (arm starts on the ground).
+    # Drive to the spot.
     drive_base.straight(M5_APPROACH_MM)
 
-    # Stage 1, once: lift the upper root arm while backing up a little (lifting in place jams).
-    # Lifts add the slop (gear backlash) on top; lowering takes it back out.
-    move_arm_to_height(
-        left_top_motor, right_top_motor, start_angle, M5_ARM_LIFT_DEGREES + ARM_SLOP_DEGREES, ARM_SPEED_SLOW, False
-    )
+    # Scoop 1: lift the upper root arm while backing up a little.
+    move_arm_degrees(left_top_motor, right_top_motor, M5_ARM_LIFT_DEGREES + ARM_SLOP_DEGREES, ARM_SPEED_SLOW, False)
     wait(M5_SCOOP_1_ARM_HEAD_START_MS)
     drive_base.straight(-M5_LIFT_BACK_UP_MM)
     left_top_motor.brake()
     right_top_motor.brake()
     wait(50)
-    wait(M5_VIDEO_LIFT_DELAY)  # Video pause after the lift.
-    # Back up with the arm still up (pulls the root out more), then arm (almost) to the
-    # bottom, come forward again.
+    # Back up with the arm still up (pulls the root out more), then arm almost to the bottom.
     drive_base.straight(-M5_BACK_UP_MM)
-    move_arm_to_height(left_top_motor, right_top_motor, start_angle, M5_ARM_LOWEST_DEGREES, ARM_SPEED_MEDIUM)
-    drive_base.straight(M5_BACK_UP_MM + 12)
+    height = (left_top_motor.angle() - start_angle) / ARM_GEAR_RATIO
+    move_arm_degrees(left_top_motor, right_top_motor, M5_ARM_LOWEST_DEGREES - height, ARM_SPEED_MEDIUM)
+
+    # S move backward and to the right, then one straight drive back in, ending
+    # M5_S_RIGHT_MM to the right (and M5_COME_BACK_SHORT_MM farther back).
+    # Each arc: sideways = radius * (1 - cos), backward = radius * sin. Two arcs make the S.
+    arc_radians = M5_S_ARC_DEGREES * pi / 180
+    s_radius = M5_S_RIGHT_MM / (2 * (1 - cos(arc_radians)))
+    s_back_mm = 2 * s_radius * sin(arc_radians)
+    drive_base.settings(straight_speed=M5_S_SPEED_MM_PER_S)
+    drive_base.arc(s_radius, angle=-M5_S_ARC_DEGREES)  # reverse, curving right
+    drive_base.arc(-s_radius, angle=-M5_S_ARC_DEGREES)  # reverse, curving back to straight
+    drive_base.settings(straight_speed=DRIVE_SPEED_DEFAULT_MM_PER_S)
+    drive_base.straight(M5_BACK_UP_MM + 12 + s_back_mm - M5_COME_BACK_SHORT_MM)
 
     for attempt in range(M5_LAUNCH_ATTEMPTS):
-        # Stage 2: lift the lower root arm while backing up a little.
-        move_arm_to_height(
-            left_top_motor, right_top_motor, start_angle, M5_ARM_PREP_DEGREES + ARM_SLOP_DEGREES, ARM_SPEED_SLOW, False
-        )
-        wait(M5_SCOOP_2_ARM_HEAD_START_MS)
-        drive_base.straight(-M5_LIFT_BACK_UP_MM)
-        left_top_motor.brake()
-        right_top_motor.brake()
-        wait(50)
-        wait(M5_VIDEO_LIFT_DELAY)  # Video pause after the lift.
-
         # Launch! Full power, then slam to a stop at a fixed height (like a mechanical stop).
         # At the same time, drive backward with a very fast start.
         drive_base.settings(
@@ -117,28 +101,27 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
         wait(100)  # Let the arm settle before measuring.
         print("Launch overshoot (arm degrees):", (left_top_motor.angle() - stop_at) / ARM_GEAR_RATIO)
 
-        # Back down to the prep height.
-        move_arm_to_height(
-            left_top_motor, right_top_motor, start_angle, M5_ARM_PREP_DEGREES + ARM_SLOP_DEGREES, ARM_SPEED_MEDIUM
-        )
         if attempt < M5_LAUNCH_ATTEMPTS - 1:
-            # Another try coming: back up, arm (almost) to the bottom, come forward to where this attempt started.
-            drive_base.straight(-M5_BACK_UP_MM)
-            move_arm_to_height(left_top_motor, right_top_motor, start_angle, M5_ARM_LOWEST_DEGREES, ARM_SPEED_MEDIUM)
-            drive_base.straight(M5_BACK_UP_MM + M5_LIFT_BACK_UP_MM + M5_LAUNCH_BACK_UP_MM)
+            # Another try: back up, arm almost to the bottom, then come back in to
+            # M5_RETRY_CLOSER_MM past where this launch started (undoing the launch back-up too).
+            drive_base.straight(-M5_RETRY_BACK_UP_MM)
+            height = (left_top_motor.angle() - start_angle) / ARM_GEAR_RATIO
+            move_arm_degrees(left_top_motor, right_top_motor, M5_ARM_LOWEST_DEGREES - height, ARM_SPEED_MEDIUM)
+            drive_base.straight(M5_RETRY_BACK_UP_MM + M5_LAUNCH_BACK_UP_MM + M5_RETRY_CLOSER_MM)
 
-    # Last attempt done: back up, arm (almost) to the bottom.
+    # Back away, then arm almost to the bottom.
     drive_base.straight(-M5_AFTER_LAUNCH_BACK_UP_MM)
-    move_arm_to_height(left_top_motor, right_top_motor, start_angle, M5_ARM_LOWEST_DEGREES, ARM_SPEED_MEDIUM)
+    height = (left_top_motor.angle() - start_angle) / ARM_GEAR_RATIO
+    move_arm_degrees(left_top_motor, right_top_motor, M5_ARM_LOWEST_DEGREES - height, ARM_SPEED_MEDIUM)
 
-    # Drive home: back to 405 mm from base (same end spot as the old version).
-    # Every drive above, added up, so changing a distance doesn't move where we end up.
+    # Drive home: back to 405 mm from base.
+    # Every drive above, added up (the S's backward part cancels out on the way back in).
     distance_from_base = (
         M5_APPROACH_MM
         - M5_LIFT_BACK_UP_MM
         - M5_BACK_UP_MM
-        + (M5_BACK_UP_MM + 12)
-        - M5_LIFT_BACK_UP_MM
+        + (M5_BACK_UP_MM + 12 - M5_COME_BACK_SHORT_MM)
+        + M5_RETRY_CLOSER_MM * (M5_LAUNCH_ATTEMPTS - 1)
         - M5_LAUNCH_BACK_UP_MM
         - M5_AFTER_LAUNCH_BACK_UP_MM
     )

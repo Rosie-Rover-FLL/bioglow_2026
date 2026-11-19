@@ -20,7 +20,6 @@ import m4
 import m5
 import m6
 import m7
-import m8
 import m9
 import m13
 import m15
@@ -36,7 +35,6 @@ MISSIONS = {
     5: m5.run,
     6: m6.run,
     7: m7.run,
-    8: m8.run,
     9: m9.run,
     13: m13.run,
     15: m15.run,
@@ -45,7 +43,7 @@ MISSIONS = {
 }
 
 # Competition run order. After a mission finishes, the selector jumps to the next one.
-MISSION_ORDER = [6, 13, 7, 17, 2, 1, 3, 15, 4, 9, 5]
+MISSION_ORDER = [6, 13, 7, 17, 2, 5, 1, 3, 15, 4, 9]
 
 MAX_MISSION = 17
 

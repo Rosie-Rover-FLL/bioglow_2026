@@ -74,7 +74,7 @@ and `requirements.txt`, with the rest intentionally left behind (see
   Tuned 2026-11-18 with a temporary `m8.py` line-only test (since deleted): back up
   at 75 mm/s to the line, back up 15 mm more, then `turn(95)`.
   `reset_arm_settings()` puts arm acceleration back to the default before every
-  mission. m5 (2026-11-17): lift the upper root arm while backing up 30 mm, back off, then lift the lower root arm the same way and launch. Since 2026-11-18: two launch attempts, and the launch is `dc(100)` then `hold()` at `M5_ARM_LAUNCH_DEGREES` (a code "stop" so the arm doesn't block the ball's path; prints the overshoot). Pushing the arm down onto its bottom stop with `dc(-30)` knocked the arm off on 2026-11-18. Don't push the arm down with `dc()`. The bottom stop was then removed (2026-11-18), so the arm now rests on the ground and falls off if it goes even 1° below its start. m5's `move_arm_to_height()` uses heights measured from the arm's angle at mission start, never lower than `M5_ARM_LOWEST_DEGREES` (2). During each launch, the robot backs up 30 mm with 10000 mm/s² acceleration. A temporary `m8.py` arm-test mission was used for tuning, then deleted.
+  mission. m5 (rebuilt 2026-11-19 from a temporary `m8.py` test, since deleted): drive out, scoop 1 (lift the upper root arm while backing up 30 mm, then back up 80 mm with the arm still up), lower the arm, a slow backward S (two reverse arcs, radius computed with `umath`) that shifts the robot `M5_S_RIGHT_MM` = 45 mm right (30 missed left, 60 missed right), straight back in, then two 90° launches. Each launch is `dc(100)` then `hold()` while backing up 30 mm at 10000 mm/s², and the second launch is 10 mm closer. The old second scoop is gone. The bottom stop was removed 2026-11-18, so the arm rests on the ground and falls off if it goes even 1° below its start. Arm heights are measured from the arm's angle at mission start, never below `M5_ARM_LOWEST_DEGREES` (2). Pushing the arm down with `dc(-30)` knocked it off, so don't push the arm down with `dc()`. A drop-then-hit launch was tried and didn't help. 
   m2's arm was too weak at `arm_until_done_or_stalled(..., 200, 180)`;
   fixed 2026-11-03 by raising the speed to 950 deg/s (arm motors max out
   at 1000 deg/s). A separate full-power `dc()` helper was tried and dropped
@@ -272,8 +272,8 @@ just tilt reading (the robot doesn't read its own tilt).
   `prime_hub.system.set_stop_button(...)` so CENTER is free to use as "run"
   instead of "stop".
 - Shows a two-digit number on the hub display, starting at
-  `MISSION_ORDER[0]` (added 2026-11-16; `MISSION_ORDER = [6, 13, 7, 17, 2,
-  1, 3, 15, 4, 9, 5]` is the competition run order). After a mission
+  `MISSION_ORDER[0]` (added 2026-11-16; `MISSION_ORDER = [6, 13, 7, 17, 2, 5,
+  1, 3, 15, 4, 9]` is the competition run order). After a mission
   *finishes* (not aborted), the selector jumps to the next mission in
   `MISSION_ORDER`, wrapping to the start; a mission not in the list leaves
   the number unchanged, and an aborted mission stays selected for a retry. Missions
