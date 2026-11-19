@@ -272,16 +272,24 @@ just tilt reading (the robot doesn't read its own tilt).
   `prime_hub.system.set_stop_button(...)` so CENTER is free to use as "run"
   instead of "stop".
 - Shows a two-digit number on the hub display, starting at
-  `MISSION_ORDER[0]` (added 2026-11-16; `MISSION_ORDER = [6, 13, 7, 17, 2, 5,
-  1, 3, 15, 4, 9]` is the competition run order). After a mission
+  `MISSION_ORDER[0]` (added 2026-11-16; `MISSION_ORDER = [6, 13, 18, 7, 17, 2,
+  5, 1, 3, 15, 4, 9]` is the competition run order). After a mission
   *finishes* (not aborted), the selector jumps to the next mission in
   `MISSION_ORDER`, wrapping to the start; a mission not in the list leaves
-  the number unchanged, and an aborted mission stays selected for a retry. Missions
-  in the `MISSION_ICONS` dict show an icon instead (currently only
-  `17: Icon.ARROW_UP`, added 2026-11-11); all display updates go through
+  the number unchanged, and an aborted mission stays selected for a retry.
+  **Optional missions** (`OPTIONAL_MISSIONS = [18]`, added 2026-11-19): when
+  the next mission in the order is optional, it shows for 2 s
+  (`OPTIONAL_MISSION_WAIT_MS`) and runs only if CENTER is pressed in that
+  time; otherwise it's skipped (m13 → m7). m18 is "Bump": it rams the m13 model
+  when its trees don't fully raise (~30% of runs). It shows an upside-down "B"
+  (`UPSIDE_DOWN_B`) because the robot is seen from the other side at that point.
+  Running missions lives in `launch_mission(number)`, which returns True if it
+  finished. Missions
+  in the `MISSION_ICONS` dict show an icon instead (
+  `17: Icon.ARROW_UP`, added 2026-11-11, and `18: UPSIDE_DOWN_B`); all display updates go through
   `show_mission()`.
 - RIGHT increments the number, LEFT decrements it (wraps between 0 and
-  `MAX_MISSION`, currently 17 — the 15 season missions plus m16/m17, which just drive between launch areas).
+  `MAX_MISSION`, currently 18 — the 15 season missions, m16/m17 which just drive between launch areas, and m18 Bump).
   `0` is reserved for remote control — never map a mission to it.
 - CENTER runs the mission mapped to the current number, via a `MISSIONS`
   dict (`{1: m1.run, ...}`) built from statically-imported mission modules.

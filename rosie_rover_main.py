@@ -25,6 +25,7 @@ import m13
 import m15
 import m16
 import m17
+import m18
 
 # Never map mission 0 -- it's remote control.
 MISSIONS = {
@@ -40,12 +41,18 @@ MISSIONS = {
     15: m15.run,
     16: m16.run,
     17: m17.run,
+    18: m18.run,
 }
 
 # Competition run order. After a mission finishes, the selector jumps to the next one.
-MISSION_ORDER = [6, 13, 7, 17, 2, 5, 1, 3, 15, 4, 9]
+MISSION_ORDER = [6, 13, 18, 7, 17, 2, 5, 1, 3, 15, 4, 9]
 
-MAX_MISSION = 17
+# After m13 we have an optional Bump mission (m18): it shows for 2 seconds and
+# only runs if CENTER is pressed. Could be used in other places too if useful.
+OPTIONAL_MISSIONS = [18]
+OPTIONAL_MISSION_WAIT_MS = 2000
+
+MAX_MISSION = 18
 
 MAX_TURN_RATE_DEGSEC = 200
 
@@ -81,8 +88,20 @@ PLAY_ICON = Matrix(
 )
 
 # Missions that show an icon instead of their number.
+# Upside-down "B" for Bump (the robot is seen from the other side for m18).
+UPSIDE_DOWN_B = Matrix(
+    [
+        [0, 100, 100, 100, 100],
+        [100, 0, 0, 0, 100],
+        [0, 100, 100, 100, 100],
+        [100, 0, 0, 0, 100],
+        [0, 100, 100, 100, 100],
+    ]
+)
+
 MISSION_ICONS = {
     17: Icon.ARROW_UP,
+    18: UPSIDE_DOWN_B,
 }
 
 # Set to False for full volume; True for late-night/quiet testing.
@@ -204,6 +223,62 @@ def handle_remote():
         right_top_motor.dc(0)
 
 
+def next_in_order(number):
+    # Next mission in the run order, wrapping to the start.
+    next_index = MISSION_ORDER.index(number) + 1
+    return MISSION_ORDER[next_index % len(MISSION_ORDER)]
+
+
+def center_pressed_within(ms):
+    watch = StopWatch()
+    while watch.time() < ms:
+        if Button.CENTER in prime_hub.buttons.pressed():
+            wait_for_release()
+            return True
+        wait(10)
+    return False
+
+
+def launch_mission(number):
+    # Returns True if the mission finished, False if CENTER aborted it.
+    rosie_rover.reset_drive_settings(drive_base)
+    rosie_rover.reset_arm_settings(left_top_motor, right_top_motor)
+    rosie_rover.print_battery(prime_hub)
+    print(f"Starting Mission {number:02}")
+    prime_hub.speaker.beep()
+    prime_hub.display.icon(PLAY_ICON)
+    watch = StopWatch()
+    # During a mission, CENTER aborts it and returns to the menu.
+    prime_hub.system.set_stop_button(Button.CENTER)
+    aborted = False
+    try:
+        MISSIONS[number](
+            left_top_motor,
+            right_top_motor,
+            left_color_sensor,
+            right_color_sensor,
+            prime_hub,
+            drive_base,
+        )
+    except SystemExit:
+        aborted = True
+    finally:
+        prime_hub.system.set_stop_button((Button.CENTER, Button.BLUETOOTH))
+    # Release the final Stop.HOLD, and stop anything still moving after an abort.
+    stop_remote_motion()
+    # Remote control always drives gyro-off.
+    drive_base.use_gyro(False)
+    elapsed_sec = watch.time() / 1000
+    prime_hub.speaker.beep()
+    if aborted:
+        print(f"Aborted Mission {number:02}, time {elapsed_sec:.1f} seconds")
+        # Don't relaunch from the CENTER press that aborted.
+        wait_for_release()
+        return False
+    print(f"Finished Mission {number:02}, time {elapsed_sec:.1f} seconds")
+    return True
+
+
 show_mission(mission_number)
 
 try:
@@ -231,47 +306,18 @@ try:
 
         elif Button.CENTER in pressed:
             wait_for_release()
-            run_mission = MISSIONS.get(mission_number)
-            if run_mission:
-                rosie_rover.reset_drive_settings(drive_base)
-                rosie_rover.reset_arm_settings(left_top_motor, right_top_motor)
-                rosie_rover.print_battery(prime_hub)
-                print(f"Starting Mission {mission_number:02}")
-                prime_hub.speaker.beep()
-                prime_hub.display.icon(PLAY_ICON)
-                watch = StopWatch()
-                # During a mission, CENTER aborts it and returns to the menu.
-                prime_hub.system.set_stop_button(Button.CENTER)
-                aborted = False
-                try:
-                    run_mission(
-                        left_top_motor,
-                        right_top_motor,
-                        left_color_sensor,
-                        right_color_sensor,
-                        prime_hub,
-                        drive_base,
-                    )
-                except SystemExit:
-                    aborted = True
-                finally:
-                    prime_hub.system.set_stop_button((Button.CENTER, Button.BLUETOOTH))
-                # Release the final Stop.HOLD, and stop anything still moving after an abort.
-                stop_remote_motion()
-                # Remote control always drives gyro-off.
-                drive_base.use_gyro(False)
-                elapsed_sec = watch.time() / 1000
-                prime_hub.speaker.beep()
-                if aborted:
-                    print(f"Aborted Mission {mission_number:02}, time {elapsed_sec:.1f} seconds")
-                    # Don't relaunch from the CENTER press that aborted.
-                    wait_for_release()
-                else:
-                    print(f"Finished Mission {mission_number:02}, time {elapsed_sec:.1f} seconds")
-                    # Next mission in the run order (aborted ones stay selected).
-                    if mission_number in MISSION_ORDER:
-                        next_index = MISSION_ORDER.index(mission_number) + 1
-                        mission_number = MISSION_ORDER[next_index % len(MISSION_ORDER)]
+            if mission_number in MISSIONS:
+                # Next mission in the run order (aborted ones stay selected).
+                if launch_mission(mission_number) and mission_number in MISSION_ORDER:
+                    mission_number = next_in_order(mission_number)
+                    if mission_number in OPTIONAL_MISSIONS:
+                        show_mission(mission_number)
+                        if center_pressed_within(OPTIONAL_MISSION_WAIT_MS):
+                            if launch_mission(mission_number):
+                                mission_number = next_in_order(mission_number)
+                        else:
+                            print(f"Skipped Mission {mission_number:02}")
+                            mission_number = next_in_order(mission_number)
             else:
                 prime_hub.display.icon(CHECKER_A)
                 wait(500)
