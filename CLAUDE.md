@@ -74,7 +74,7 @@ and `requirements.txt`, with the rest intentionally left behind (see
   Tuned 2026-11-18 with a temporary `m8.py` line-only test (since deleted): back up
   at 75 mm/s to the line, back up 15 mm more, then `turn(95)`.
   `reset_arm_settings()` puts arm acceleration back to the default before every
-  mission. m5 (2026-11-17): lift the upper root arm while backing up 30 mm, back off, then lift the lower root arm the same way and launch (one attempt). A temporary `m8.py` arm-test mission was used for tuning, then deleted.
+  mission. m5 (2026-11-17): lift the upper root arm while backing up 30 mm, back off, then lift the lower root arm the same way and launch. Since 2026-11-18: two launch attempts, and the launch is `dc(100)` then `hold()` at `M5_ARM_LAUNCH_DEGREES` (a code "stop" so the arm doesn't block the ball's path; prints the overshoot). Pushing the arm down onto its bottom stop with `dc(-30)` knocked the arm off on 2026-11-18. Don't push the arm down with `dc()`. The bottom stop was then removed (2026-11-18), so the arm now rests on the ground and falls off if it goes even 1° below its start. m5's `move_arm_to_height()` uses heights measured from the arm's angle at mission start, never lower than `M5_ARM_LOWEST_DEGREES` (2). During each launch, the robot backs up 30 mm with 10000 mm/s² acceleration. A temporary `m8.py` arm-test mission was used for tuning, then deleted.
   m2's arm was too weak at `arm_until_done_or_stalled(..., 200, 180)`;
   fixed 2026-11-03 by raising the speed to 950 deg/s (arm motors max out
   at 1000 deg/s). A separate full-power `dc()` helper was tried and dropped
