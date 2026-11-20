@@ -6,7 +6,7 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     drive_base.settings(straight_speed=500)
     drive_base.use_gyro(True)
     drive_base.straight(700)
-    drive_base.arc(-120, angle=50)
+    drive_base.arc(-150, angle=45)
 
     # Raise the arm at max speed and acceleration.
     left_top_motor.control.limits(acceleration=20000)
