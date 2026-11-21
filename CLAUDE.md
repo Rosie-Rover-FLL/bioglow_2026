@@ -26,31 +26,16 @@ and `requirements.txt`, with the rest intentionally left behind (see
   (see `.vscode/tasks.json`). The hub's BLE name is stored in
   `.vscode/settings.json` as `fllRobotName` (currently `"Rosie Rover"`).
 
-## KISS branch: coach work taken out (2026-11-20)
+## KISS branch: coach work taken out, then rebuilt with the team (2026-11-20)
 
-The `KISS` branch is temporary. It takes out some changes that David (the
-coach) made himself. They were coach experiments, and the team should
-talk them over first. The goal is to end up in the same place, but with
-the coach guiding the team, not the coach doing the work. They are all
-still on `main`:
-
-- **m18 "Bump" and optional missions**: `m18.py` is deleted. The optional-mission
-  code in `rosie_rover_main.py` is gone (`OPTIONAL_MISSIONS`,
-  `OPTIONAL_MISSION_WAIT_MS`, `UPSIDE_DOWN_B`, `center_pressed_within()`). m13
-  now goes straight to m7.
-- **m17's compost-hatch spin**: m17 is back to the start on the wall. It does
-  three `Stop.NONE` arcs, then `straight(550)` into the left launch area, with
-  no `turn(353)` spin. The gyro is off too (it messed up m17). It keeps
-  `straight_speed=700`.
-- **Auto-advance to the next mission**: `MISSION_ORDER` and `next_in_order()`
-  are gone. The kids liked pressing the buttons to pick the mission, so after
-  a mission runs the number just stays put. The selector starts at 1.
-- **m4's arc tweak**: back to `drive_base.arc(-150, angle=45)` (it had been
-  changed to `arc(-120, angle=50)` in 14086aa).
-
-The rest of the coach changes stayed on purpose because they're small:
-m6's line finding, and m1/m2/m3/m5/m7/m9/m13. Don't bring the changes
-above back on this branch unless the team decides to rebuild them.
+David (the coach) made the `KISS` branch to take out four changes he had
+built himself: m18 "Bump" with optional missions, m17's compost-hatch spin,
+m4's arc tweak, and the mission auto-advance. They were coach experiments,
+and the team should talk them over first. Authentic team work matters more
+than anything else. The coach guides the team and doesn't do the work.
+The team met the same evening and put all four back one at a time, so the
+code now matches `main` again. Going forward, mission changes should come
+from the team, with the coach guiding.
 
 ## Repo layout
 
@@ -112,7 +97,7 @@ above back on this branch unless the team decides to rebuild them.
   default; turning it on changes how far every tuned `turn()`/`arc()` goes).
   Since 2026-11-13, mostly-straight missions turn the gyro on themselves
   with `drive_base.use_gyro(True)` as the first line of `run()`: m1, m2,
-  m3, m4, m5, m7, m9, m13. m6, m15, m17 stay gyro-off (the reset turns it back off
+  m3, m4, m5, m7, m9, m13, m17. m6, m15 stay gyro-off (the reset turns it back off
   before each mission, so this doesn't leak into other missions).
   After every mission, `rosie_rover_main.py` calls `drive_base.stop()`
   (added 2026-11-15): the last move ends with `Stop.HOLD`, so without
@@ -297,17 +282,25 @@ just tilt reading (the robot doesn't read its own tilt).
 - Reassigns the stop button to `(Button.CENTER, Button.BLUETOOTH)` via
   `prime_hub.system.set_stop_button(...)` so CENTER is free to use as "run"
   instead of "stop".
-- Shows a two-digit number on the hub display, starting at 1. After a
-  mission runs, the number stays the same and the kids change it with
-  LEFT/RIGHT (the auto-advance `MISSION_ORDER` was taken out on the KISS
-  branch, see above).
+- Shows a two-digit number on the hub display, starting at
+  `MISSION_ORDER[0]` (added 2026-11-16; `MISSION_ORDER = [6, 13, 18, 7, 17, 2,
+  5, 1, 3, 15, 4, 9]` is the competition run order). After a mission
+  *finishes* (not aborted), the selector jumps to the next mission in
+  `MISSION_ORDER`, wrapping to the start; a mission not in the list leaves
+  the number unchanged, and an aborted mission stays selected for a retry.
+  **Optional missions** (`OPTIONAL_MISSIONS = [18]`, added 2026-11-19): when
+  the next mission in the order is optional, it shows for 2 s
+  (`OPTIONAL_MISSION_WAIT_MS`) and runs only if CENTER is pressed in that
+  time; otherwise it's skipped (m13 → m7). m18 is "Bump": it rams the m13 model
+  when its trees don't fully raise (~30% of runs). It shows an upside-down "B"
+  (`UPSIDE_DOWN_B`) because the robot is seen from the other side at that point.
   Running missions lives in `launch_mission(number)`, which returns True if it
   finished. Missions
   in the `MISSION_ICONS` dict show an icon instead (
-  `17: Icon.ARROW_UP`, added 2026-11-11); all display updates go through
+  `17: Icon.ARROW_UP`, added 2026-11-11, and `18: UPSIDE_DOWN_B`); all display updates go through
   `show_mission()`.
 - RIGHT increments the number, LEFT decrements it (wraps between 0 and
-  `MAX_MISSION`, currently 17 — the 15 season missions, plus m16/m17 which just drive between launch areas).
+  `MAX_MISSION`, currently 18 — the 15 season missions, m16/m17 which just drive between launch areas, and m18 Bump).
   `0` is reserved for remote control — never map a mission to it.
 - CENTER runs the mission mapped to the current number, via a `MISSIONS`
   dict (`{1: m1.run, ...}`) built from statically-imported mission modules.
