@@ -15,8 +15,6 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     right_top_motor.brake()
     left_top_motor.brake()
 
-    drive_base.straight(10)
-
     left_top_motor.dc(100)
     right_top_motor.dc(100)
     wait(160)
@@ -36,9 +34,9 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     wait(160)
     right_top_motor.brake()
     left_top_motor.brake()
-    
+
     drive_base.straight(10)
-    
+
     left_top_motor.dc(-100)
     right_top_motor.dc(-100)
     wait(160)
