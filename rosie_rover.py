@@ -53,7 +53,9 @@ ARM_ACCELERATION_MAX = 20000
 
 # Color sensor reflection (0-100%). Measured 2026-11-18, low room light:
 # black 11-18, mat up to 88 (so black must come first), white 84-87.
-BLACK_LINE_BELOW_REFLECTION = 25
+# 2026-11-21: line black 9-14, but a dark mat spot before the line read 20-23,
+# so black was lowered from 25 to 18 to stop false blacks.
+BLACK_LINE_BELOW_REFLECTION = 18
 WHITE_LINE_ABOVE_REFLECTION = 75
 
 # True = print color sensor readings every 50 ms while looking for the white line.

@@ -74,7 +74,7 @@ from the team, with the coach guiding.
   `drive_until_black_then_white_line(drive_base, left_color_sensor,
   right_color_sensor, distance, speed)` (2026-11-18) drives like
   `straight(distance)`. It stops as soon as either sensor has read black
-  (`reflection()` < `BLACK_LINE_BELOW_REFLECTION`, 25) and then white
+  (`reflection()` < `BLACK_LINE_BELOW_REFLECTION`, 18; was 25 until 2026-11-21, when a dark mat spot read 20-23) and then white
   (> `WHITE_LINE_ABOVE_REFLECTION`, 75). Black comes first because the mat read up
   to 88. Returns True if it found the line. It does **line finding only, no
   straightening**. Squaring to the line (atan2 turn, then a wheel-per-sensor
