@@ -26,6 +26,17 @@ and `requirements.txt`, with the rest intentionally left behind (see
   (see `.vscode/tasks.json`). The hub's BLE name is stored in
   `.vscode/settings.json` as `fllRobotName` (currently `"Rosie Rover"`).
 
+## KISS branch: coach work taken out, then rebuilt with the team (2026-11-20)
+
+David (the coach) made the `KISS` branch to take out four changes he had
+built himself: m18 "Bump" with optional missions, m17's compost-hatch spin,
+m4's arc tweak, and the mission auto-advance. They were coach experiments,
+and the team should talk them over first. Authentic team work matters more
+than anything else. The coach guides the team and doesn't do the work.
+The team met the same evening and put all four back one at a time, so the
+code now matches `main` again. Going forward, mission changes should come
+from the team, with the coach guiding.
+
 ## Repo layout
 
 - `rosie_rover_main.py` — our top-level program that runs on the robot's
@@ -86,7 +97,7 @@ and `requirements.txt`, with the rest intentionally left behind (see
   default; turning it on changes how far every tuned `turn()`/`arc()` goes).
   Since 2026-11-13, mostly-straight missions turn the gyro on themselves
   with `drive_base.use_gyro(True)` as the first line of `run()`: m1, m2,
-  m3, m4, m5, m7, m9, m13. m6, m15, m17 stay gyro-off (the reset turns it back off
+  m3, m4, m5, m7, m9, m13, m17. m6, m15 stay gyro-off (the reset turns it back off
   before each mission, so this doesn't leak into other missions).
   After every mission, `rosie_rover_main.py` calls `drive_base.stop()`
   (added 2026-11-15): the last move ends with `Stop.HOLD`, so without
