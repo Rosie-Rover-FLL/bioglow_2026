@@ -1,7 +1,10 @@
 # Rosie Robotics
 # Team #75872
 
-Pybricks code for the 2026 FLL Bioglow season.
+Pybricks code for the 2026 FLL Bioglow season. We use this code and this Google Doc:
+[https://docs.google.com/presentation/d/1kRcw8NT4uLoHNQw422hAnxL7vIgtyVC-plvW4fLKeEg/edit?usp=sharing](https://docs.google.com/presentation/d/1kRcw8NT4uLoHNQw422hAnxL7vIgtyVC-plvW4fLKeEg/edit?usp=sharing)
+
+to run our missions. This README will focus on instructions for the computer setup to use this repo (info from me to other coaches and me to future me that will forget).
 
 ## Computer Setup
 
