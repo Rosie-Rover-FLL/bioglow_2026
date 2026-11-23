@@ -45,7 +45,7 @@ MISSIONS = {
 }
 
 # Competition run order. After a mission finishes, the selector jumps to the next one.
-MISSION_ORDER = [6, 13, 18, 7, 17, 5, 1, 3, 15, 2, 4, 9]
+MISSION_ORDER = [13, 18, 6, 7, 17, 5, 1, 3, 15, 2, 4, 9]
 
 # After m13 we have an optional Bump mission (m18): it shows for 2 seconds and
 # only runs if CENTER is pressed. Could be used in other places too if useful.

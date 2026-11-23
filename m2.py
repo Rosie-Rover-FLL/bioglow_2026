@@ -6,7 +6,7 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     drive_base.use_gyro(True)
     # Gentle start to avoid wheel slip.
     drive_base.settings(straight_speed=450, straight_acceleration=(550, 800))
-    drive_base.straight(285)
+    drive_base.straight(300)
 
     # Raise the arm at max speed and acceleration.
     left_top_motor.control.limits(acceleration=20000)

@@ -7,19 +7,21 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     wait(TEST_DELAY)
     # drive_base.straight(660)
     drive_base.straight(680)
-    drive_base.arc(200, 22)
+    drive_base.arc(200, 26)
 
     left_top_motor.dc(-100)
     right_top_motor.dc(-100)
     wait(160)
     right_top_motor.brake()
     left_top_motor.brake()
+    wait(20)
 
     left_top_motor.dc(100)
     right_top_motor.dc(100)
-    wait(160)
+    wait(170)
     right_top_motor.brake()
     left_top_motor.brake()
+    wait(20)
 
     drive_base.straight(10)
 
@@ -28,20 +30,23 @@ def run(left_top_motor, right_top_motor, left_color_sensor, right_color_sensor, 
     wait(160)
     right_top_motor.brake()
     left_top_motor.brake()
+    wait(20)
 
     left_top_motor.dc(100)
     right_top_motor.dc(100)
-    wait(160)
+    wait(170)
     right_top_motor.brake()
     left_top_motor.brake()
+    wait(20)
 
     drive_base.straight(10)
 
     left_top_motor.dc(-100)
     right_top_motor.dc(-100)
-    wait(160)
+    wait(120)
     right_top_motor.brake()
     left_top_motor.brake()
+    wait(20)
 
     drive_base.arc(200, -25)
     drive_base.straight(-165)
